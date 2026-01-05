@@ -3,6 +3,9 @@ import 'dart:ui'; // Blur Effect ke liye
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// ✅ IMPORT YOUR BRAIN HERE
+import 'ai_logic.dart';
+
 // --- APP ENTRY POINT ---
 void main() {
   runApp(const CodeNetraApp());
@@ -20,8 +23,7 @@ class CodeNetraApp extends StatelessWidget {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF000000), // Pure Black
         primaryColor: const Color(0xFFCCFF00), // Neon Green
-        // Yahan se saare Icons White ho jayenge
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white), // All Icons White
         textTheme: GoogleFonts.outfitTextTheme(
           Theme.of(context).textTheme,
         ).apply(bodyColor: Colors.white, displayColor: Colors.white),
@@ -33,7 +35,7 @@ class CodeNetraApp extends StatelessWidget {
 }
 
 // =============================================================================
-// 1. APPLE STYLE "HELLO" SPLASH ANIMATION (CENTERED FIX) 🍎
+// 1. APPLE STYLE SPLASH SCREEN 🍎
 // =============================================================================
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -57,7 +59,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       duration: const Duration(seconds: 3),
     );
 
-    // 1. Fade In
     _opacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -65,7 +66,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       ),
     );
 
-    // 2. Blur Effect (Blurry -> Clear)
     _blurAnim = Tween<double>(begin: 10.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -73,7 +73,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       ),
     );
 
-    // 3. Scale Up
     _scaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -110,7 +109,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      // ✅ Center Widget lagaya hai taaki side me na bhage
       body: Center(
         child: AnimatedBuilder(
           animation: _controller,
@@ -158,9 +156,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 100),
-
                 AnimatedOpacity(
                   opacity: _showButton ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 800),
@@ -203,7 +199,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
 }
 
 // =============================================================================
-// 2. MAIN LAYOUT (SIDEBAR SCROLL FIX) ✅
+// 2. MAIN LAYOUT
 // =============================================================================
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -223,7 +219,7 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       HomeScreen(onNavigate: _changeScreen),
-      const ChatScreen(),
+      const ChatScreen(), // ✅ REAL AI CHAT SCREEN
       const TemplatesScreen(),
       const PDFScreen(),
       const ImageGenScreen(),
@@ -292,7 +288,7 @@ class _MainLayoutState extends State<MainLayout> {
   }
 }
 
-// --- SIDEBAR CONTENT (SCROLLABLE TO FIX YELLOW STRIPES) ---
+// --- SIDEBAR CONTENT ---
 class SidebarContent extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
@@ -328,7 +324,6 @@ class SidebarContent extends StatelessWidget {
           ),
           const SizedBox(height: 30),
 
-          // ✅ Expanded + ScrollView (Ye Glitch fix karega)
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -337,13 +332,11 @@ class SidebarContent extends StatelessWidget {
                   _header("CORE"),
                   _btn("Home", Icons.home_filled, 0),
                   _btn("Chat & Actions", Icons.chat_bubble, 1),
-
                   const SizedBox(height: 20),
                   _header("TOOLS"),
                   _btn("Templates", Icons.dashboard_outlined, 2),
                   _btn("PDF Analysis", Icons.picture_as_pdf_outlined, 3),
                   _btn("Text to Image", Icons.image_outlined, 4),
-
                   const SizedBox(height: 20),
                   _header("ADVANCED"),
                   _btn("Code Expert", Icons.terminal, 5),
@@ -559,43 +552,37 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryItem(String text, IconData icon) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111111),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: const Color(0xFF1F1F1F),
-            radius: 20,
-            child: Icon(icon, size: 18, color: const Color(0xFFCCFF00)),
+  Widget _buildHistoryItem(String text, IconData icon) => Container(
+    margin: const EdgeInsets.only(bottom: 10),
+    padding: const EdgeInsets.all(15),
+    decoration: BoxDecoration(
+      color: const Color(0xFF111111),
+      borderRadius: BorderRadius.circular(15),
+      border: Border.all(color: Colors.white10),
+    ),
+    child: Row(
+      children: [
+        CircleAvatar(
+          backgroundColor: const Color(0xFF1F1F1F),
+          radius: 20,
+          child: Icon(icon, size: 18, color: const Color(0xFFCCFF00)),
+        ),
+        const SizedBox(width: 15),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const Icon(
-            Icons.more_vert,
-            color: Colors.white,
-            size: 20,
-          ), // Fixed Icon Color
-        ],
-      ),
-    );
-  }
+        ),
+        const Icon(Icons.more_vert, color: Colors.white, size: 20),
+      ],
+    ),
+  );
 }
 
 // =============================================================================
-// 4. CHAT SCREEN
+// 4. CHAT SCREEN (REAL AI CONNECTED 🧠)
 // =============================================================================
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -608,36 +595,49 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Map<String, String>> _messages = [];
   final ScrollController _scrollController = ScrollController();
   bool _isTyping = false;
-  void _sendMessage() {
+
+  // ✅ AI BRAIN CONNECTED
+  final AIBrain _aiBrain = AIBrain();
+
+  @override
+  void initState() {
+    super.initState();
+    _aiBrain.initBrain(); // Brain Start
+  }
+
+  void _sendMessage() async {
     if (_controller.text.isEmpty) return;
+    String userText = _controller.text;
+
     setState(() {
-      _messages.add({"role": "user", "text": _controller.text});
+      _messages.add({"role": "user", "text": userText});
       _controller.clear();
       _isTyping = true;
     });
+
     Future.delayed(
       const Duration(milliseconds: 100),
       () =>
           _scrollController.jumpTo(_scrollController.position.maxScrollExtent),
     );
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _isTyping = false;
-          _messages.add({
-            "role": "ai",
-            "text":
-                "I am CodeNetra. Powered by Google Gemini.\nHow can I assist your hackathon project today?",
-          });
+
+    // ✅ ASK LARAVEL
+    String? aiResponse = await _aiBrain.askLaravel(userText);
+
+    if (mounted) {
+      setState(() {
+        _isTyping = false;
+        _messages.add({
+          "role": "ai",
+          "text": aiResponse ?? "Could not connect to Brain.",
         });
-        Future.delayed(
-          const Duration(milliseconds: 100),
-          () => _scrollController.jumpTo(
-            _scrollController.position.maxScrollExtent,
-          ),
-        );
-      }
-    });
+      });
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -751,9 +751,10 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Row(
               children: [
                 const SizedBox(width: 5),
+                // Stop Speaking Button
                 IconButton(
-                  icon: const Icon(Icons.add_circle, color: Colors.grey),
-                  onPressed: () {},
+                  icon: const Icon(Icons.volume_off, color: Colors.grey),
+                  onPressed: () => _aiBrain.stopSpeaking(),
                 ),
                 Expanded(
                   child: TextField(
@@ -970,7 +971,7 @@ class CodeExpertScreen extends StatelessWidget {
 }
 
 // =============================================================================
-// 7. OTHER SCREENS (PDF, Image, Voice, Upgrade)
+// 7. OTHER SCREENS
 // =============================================================================
 class PDFScreen extends StatefulWidget {
   const PDFScreen({super.key});
