@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "355880755380",
+    "project_id": "codenetra-ai",
+    "storage_bucket": "codenetra-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:355880755380:android:54e2d6c30a391d8759f7e1",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAgqXtQigdhtVUTHKWruVnZm_q6UMxF6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

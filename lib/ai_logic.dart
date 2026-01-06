@@ -1,52 +1,42 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class AIBrain {
-  // ✅ Apka Public Server Link (Port 8000)
-  static const String _backendUrl =
-      'https://8000-firebase-ai-nexus-backend-1766997874464.cluster-mwsteha33jfdowtvzffztbjcj6.cloudworkstations.dev/api/chat';
+  // ⚠️ यहाँ अपनी API KEY डालें (फिलहाल मैं Placeholder डाल रहा हूँ)
+  // आप https://aistudio.google.com/app/apikey से की (Key) ले सकते हैं
+  static const String _apiKey = "AIzaSyB8pvagisvGUVIDSOLNzMW_uvEIg6BfAxA";
 
-  final FlutterTts _tts = FlutterTts();
+  late GenerativeModel _model;
+  late ChatSession _chat;
 
-  Future<void> initBrain() async {
-    await _tts.setLanguage("en-US");
-    await _tts.setPitch(1.0);
-  }
-
-  Future<String?> askLaravel(String userMessage) async {
+  // 🧠 Brain को स्टार्ट करना
+  void initBrain() {
     try {
-      final response = await http.post(
-        Uri.parse(_backendUrl),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"message": userMessage}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        try {
-          String aiReply = data['candidates'][0]['content']['parts'][0]['text'];
-          aiReply = aiReply.replaceAll('*', '');
-
-          speak(aiReply);
-          return aiReply;
-        } catch (e) {
-          return data['reply'] ?? response.body;
-        }
-      } else {
-        return "Server Error: ${response.statusCode}";
-      }
+      _model = GenerativeModel(model: 'gemini-pro', apiKey: _apiKey);
+      _chat = _model.startChat();
+      print("✅ CodeNetra Brain: ACTIVE");
     } catch (e) {
-      return "Connection Error: $e";
+      print("❌ Brain Error: $e");
     }
   }
 
-  Future<void> speak(String text) async {
-    await _tts.speak(text);
+  // 🗣️ सवाल पूछने का फंक्शन (आपके कोड के नाम के हिसाब से)
+  Future<String?> askLaravel(String prompt) async {
+    try {
+      if (_apiKey == "YOUR_GEMINI_API_KEY_HERE") {
+        return "⚠️ Error: API Key नहीं डाली गई है! कृपया ai_logic.dart में अपनी Gemini API Key डालें।";
+      }
+
+      final content = Content.text(prompt);
+      final response = await _chat.sendMessage(content);
+
+      return response.text;
+    } catch (e) {
+      return "Error: ${e.toString()}";
+    }
   }
 
-  Future<void> stopSpeaking() async {
-    await _tts.stop();
+  // 🔇 बोलने को रोकने का फंक्शन (अभी खाली है, बाद में TTS जोड़ेंगे)
+  void stopSpeaking() {
+    print("Stopping voice...");
   }
 }
