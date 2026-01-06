@@ -3,11 +3,22 @@ import 'dart:ui'; // Blur Effect ke liye
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// ✅ IMPORT YOUR BRAIN HERE
+// ✅ FIREBASE IMPORTS (जोड़े गए हैं)
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+// ✅ YOUR BRAIN IMPORT
 import 'ai_logic.dart';
 
 // --- APP ENTRY POINT ---
-void main() {
+
+void main() async {
+  // ✅ Async कर दिया गया है
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ FIREBASE INITIALIZATION (जुड़ गया)
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const CodeNetraApp());
 }
 
@@ -37,8 +48,10 @@ class CodeNetraApp extends StatelessWidget {
 // =============================================================================
 // 1. APPLE STYLE SPLASH SCREEN 🍎
 // =============================================================================
+
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
+
   @override
   State<SplashView> createState() => _SplashViewState();
 }
@@ -201,8 +214,10 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
 // =============================================================================
 // 2. MAIN LAYOUT
 // =============================================================================
+
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
+
   @override
   State<MainLayout> createState() => _MainLayoutState();
 }
@@ -289,6 +304,7 @@ class _MainLayoutState extends State<MainLayout> {
 }
 
 // --- SIDEBAR CONTENT ---
+
 class SidebarContent extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
@@ -323,7 +339,6 @@ class SidebarContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 30),
-
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -345,7 +360,6 @@ class SidebarContent extends StatelessWidget {
               ),
             ),
           ),
-
           const SizedBox(height: 10),
           _btn("Upgrade Plan", Icons.bolt, 7, isHighlight: true),
           const SizedBox(height: 30),
@@ -414,6 +428,7 @@ class SidebarContent extends StatelessWidget {
 // =============================================================================
 // 3. HOME SCREEN
 // =============================================================================
+
 class HomeScreen extends StatelessWidget {
   final Function(int) onNavigate;
   const HomeScreen({super.key, required this.onNavigate});
@@ -440,7 +455,6 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(color: Colors.grey[400], fontSize: 16),
             ),
             const SizedBox(height: 30),
-
             GestureDetector(
               onTap: () => onNavigate(1),
               child: Container(
@@ -493,7 +507,6 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
             GestureDetector(
               onTap: () => onNavigate(4),
               child: Container(
@@ -533,7 +546,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 30),
             Text(
               "Recent Activity",
@@ -584,8 +596,10 @@ class HomeScreen extends StatelessWidget {
 // =============================================================================
 // 4. CHAT SCREEN (REAL AI CONNECTED 🧠)
 // =============================================================================
+
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
+
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -621,7 +635,7 @@ class _ChatScreenState extends State<ChatScreen> {
           _scrollController.jumpTo(_scrollController.position.maxScrollExtent),
     );
 
-    // ✅ ASK LARAVEL
+    // ✅ ASK LARAVEL (Gemini)
     String? aiResponse = await _aiBrain.askLaravel(userText);
 
     if (mounted) {
@@ -629,7 +643,7 @@ class _ChatScreenState extends State<ChatScreen> {
         _isTyping = false;
         _messages.add({
           "role": "ai",
-          "text": aiResponse ?? "Could not connect to Brain.",
+          "text": aiResponse ?? "Could not connect connect Brain.",
         });
       });
       _scrollController.animateTo(
@@ -680,7 +694,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   itemCount: _messages.length + (_isTyping ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index == _messages.length)
+                    if (index == _messages.length) {
                       return Padding(
                         padding: const EdgeInsets.only(left: 10, bottom: 10),
                         child: Text(
@@ -691,6 +705,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                         ),
                       );
+                    }
                     final isUser = _messages[index]['role'] == "user";
                     return Align(
                       alignment: isUser
@@ -796,8 +811,10 @@ class _ChatScreenState extends State<ChatScreen> {
 // =============================================================================
 // 5. TEMPLATES SCREEN
 // =============================================================================
+
 class TemplatesScreen extends StatelessWidget {
   const TemplatesScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -868,8 +885,10 @@ class TemplatesScreen extends StatelessWidget {
 // =============================================================================
 // 6. CODE EXPERT SCREEN
 // =============================================================================
+
 class CodeExpertScreen extends StatelessWidget {
   const CodeExpertScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -918,7 +937,7 @@ class CodeExpertScreen extends StatelessWidget {
                   const Expanded(
                     child: SingleChildScrollView(
                       child: Text(
-                        "def win_hackathon(team):\n  if team == 'CodeNetra':\n    rank = 1\n    print('Judges are impressed!')\n    return rank\n  else:\n    return 'Try again'\n\n# Paste your buggy code here...",
+                        "def win_hackathon(team):\n if team == 'CodeNetra':\n rank = 1\n print('Judges are impressed!')\n return rank\n else:\n return 'Try again'\n\n# Paste your buggy code here...",
                         style: TextStyle(
                           fontFamily: 'monospace',
                           color: Color(0xFFCCFF00),
@@ -973,8 +992,10 @@ class CodeExpertScreen extends StatelessWidget {
 // =============================================================================
 // 7. OTHER SCREENS
 // =============================================================================
+
 class PDFScreen extends StatefulWidget {
   const PDFScreen({super.key});
+
   @override
   State<PDFScreen> createState() => _PDFScreenState();
 }
@@ -982,6 +1003,7 @@ class PDFScreen extends StatefulWidget {
 class _PDFScreenState extends State<PDFScreen> {
   bool isFileUploaded = false;
   String? uploadedFileName;
+
   void _openFileGallery() {
     showDialog(
       context: context,
@@ -1136,6 +1158,7 @@ class _PDFScreenState extends State<PDFScreen> {
 
 class ImageGenScreen extends StatefulWidget {
   const ImageGenScreen({super.key});
+
   @override
   State<ImageGenScreen> createState() => _ImageGenScreenState();
 }
@@ -1143,17 +1166,19 @@ class ImageGenScreen extends StatefulWidget {
 class _ImageGenScreenState extends State<ImageGenScreen> {
   bool isGenerating = false;
   bool imageGenerated = false;
+
   void _generateImage() {
     setState(() {
       isGenerating = true;
       imageGenerated = false;
     });
     Future.delayed(const Duration(seconds: 4), () {
-      if (mounted)
+      if (mounted) {
         setState(() {
           isGenerating = false;
           imageGenerated = true;
         });
+      }
     });
   }
 
@@ -1255,6 +1280,7 @@ class _ImageGenScreenState extends State<ImageGenScreen> {
 
 class VoiceScreen extends StatelessWidget {
   const VoiceScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -1361,6 +1387,7 @@ class VoiceScreen extends StatelessWidget {
 
 class UpgradeScreen extends StatelessWidget {
   const UpgradeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
