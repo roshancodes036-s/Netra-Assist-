@@ -1,45 +1,45 @@
 name: myapp
 description: "A new Flutter project."
 
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.0
+  sdk: ^3.0.0
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  # Icons
   cupertino_icons: ^1.0.8
-
-  # CodeNetra ke purane packages
-  google_fonts: ^6.1.0
   lucide_icons: ^0.257.0
+
+  # Fonts & State Management
+  google_fonts: ^6.1.0
   provider: ^6.1.5+1
 
-  # ✅ YE DOH NAYE PACKAGES JOD DIYE HAIN (Backend + Voice ke liye)
+  # ✅ Backend & AI
   http: ^1.2.0
-  flutter_tts: ^3.8.3
   firebase_core: ^4.3.0
   cloud_firestore: ^6.1.1
   google_generative_ai: ^0.4.7
 
+  # ✅ Voice & Files (Updated for Bug Fixes)
+  flutter_tts: ^3.8.3         # App bolega
+  speech_to_text: ^7.3.0      # ✅ FIX: Isse 6.6.1 se 7.3.0 kiya taki Error n aaye
+  file_picker: ^8.0.0         # PDF/Zip upload karne ke liye
+  permission_handler: ^11.3.0 # Mic/File permission ke liye
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices.
   flutter_lints: ^5.0.0
 
 flutter:
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
+
+  # ✅ Assets
+  assets:
+    - assets/orb.gif
