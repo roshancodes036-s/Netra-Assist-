@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.0.0
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -18,21 +18,21 @@ dependencies:
 
   # Fonts & State Management
   google_fonts: ^6.1.0
-  provider: ^6.1.5+1
+  provider: ^6.1.2
 
-  # ✅ Backend & AI
+  # 🌐 Network & AI
   http: ^1.2.0
-  firebase_core: ^4.3.0
-  cloud_firestore: ^6.1.1
   google_generative_ai: ^0.4.7
 
-  # ✅ Voice, Files & Camera (Updated)
-  flutter_tts: ^3.8.3         # App bolega
-  speech_to_text: ^7.3.0      # Aapne jo update manga tha
-  file_picker: ^8.0.0         # PDF/Zip upload karne ke liye
-  permission_handler: ^11.3.0 # Permission ke liye
-  
-  # 🚨 YE MISSING THA (Iske bina Camera/Gallery nahi chalega)
+  # 🔥 Firebase (STABLE – SDK 34 compatible)
+  firebase_core: 2.32.0
+  cloud_firestore: 4.17.5
+
+  # 🎤 Voice, Files & Camera
+  flutter_tts: ^3.8.3
+  speech_to_text: ^7.3.0
+  file_picker: ^8.0.0
+  permission_handler: ^11.3.0
   image_picker: ^1.0.7
 
 dev_dependencies:
@@ -43,6 +43,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # ✅ Assets
   assets:
     - assets/orb.gif
