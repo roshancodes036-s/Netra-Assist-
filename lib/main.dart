@@ -181,10 +181,10 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       HomeScreen(onNavigate: _changeScreen, isDevMode: _isDevMode), // 0
-      const RepoChatScreen(), // 1 (UPDATED: ZIP + LINK)
+      const RepoChatScreen(), // 1 (ULTIMATE VERSION)
       const TemplatesScreen(), // 2
       const ErrorFixerScreen(), // 3
-      const UIToCodeScreen(), // 4 (UPDATED: SPLIT UI)
+      const UIToCodeScreen(), // 4 (TEACHER VERSION)
       const PDFScreen(), // 5
       const VoiceScreen(), // 6
       const UpgradeScreen(), // 7
@@ -548,7 +548,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 // =============================================================================
-// 🔥 4. REPO CHAT SCREEN (FINAL: ZIP + GITHUB + NEON)
+// 🔥 4. REPO CHAT SCREEN (ULTIMATE: MULTI-LANGUAGE + ACCURATE INDEXING)
 // =============================================================================
 
 class RepoChatScreen extends StatefulWidget {
@@ -574,14 +574,12 @@ class _RepoChatScreenState extends State<RepoChatScreen>
   late ScrollController _suggestionsController;
   late Timer _suggestionTimer;
   final List<String> _suggestions = [
-    "🔥 Analyze features from code",
-    "🐛 Find bugs in main.dart",
-    "🚀 How to optimize ListView?",
-    "🛠️ Refactor this logic",
-    "📱 Explain the UI structure",
-    "📦 Check pubspec.yaml dependencies",
-    "🎨 Change theme to Dark Mode",
-    "🔐 Where is the API Key?",
+    "📦 Analyze pubspec.yaml/package.json",
+    "🚀 Explain the main entry point",
+    "📂 Show me the full file structure",
+    "🔐 Check for API Key leaks",
+    "🐛 Find potential bugs",
+    "🎨 Identify the Theme/Styles",
   ];
 
   @override
@@ -595,7 +593,7 @@ class _RepoChatScreenState extends State<RepoChatScreen>
     });
 
     _addMessage("ai",
-        "Hello! 👋\nI am ready for **DEEP ANALYSIS**.\n\nTap the **+** button to Upload a ZIP or Link a GitHub Repo.");
+        "Hello Developer! 👨‍💻\n\nI am ready for **Universal Code Analysis**.\nUpload your ZIP (Flutter, React, Python, or Web), and I will auto-detect the language and scan critical files.");
   }
 
   void _startAutoScroll() {
@@ -622,7 +620,7 @@ class _RepoChatScreenState extends State<RepoChatScreen>
     super.dispose();
   }
 
-  // --- 1. ZIP UPLOAD LOGIC ---
+  // --- 1. SMART ZIP LOGIC (MULTI-LANGUAGE + PRIORITY) ---
   Future<void> _pickZipFile() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -647,42 +645,157 @@ class _RepoChatScreenState extends State<RepoChatScreen>
 
         final archive = ZipDecoder().decodeBytes(bytes);
         StringBuffer extractedCode = StringBuffer();
+        List<String> allFileNames = [];
 
-        extractedCode.writeln(
-            "SYSTEM INSTRUCTION: You are a Senior Flutter Engineer. Read the code below deeply.\n\n--- START OF CODEBASE ---");
+        // 1️⃣ STEP 1: INDEXING & LANGUAGE DETECTION
+        bool isFlutter = false;
+        bool isNodeOrReact = false;
+        bool isPython = false;
+        bool isWeb = false;
 
-        int fileCount = 0;
         for (final file in archive) {
           if (file.isFile) {
-            final fName = file.name;
-            if (fName.endsWith(".dart") ||
-                fName.endsWith(".yaml") ||
-                fName.endsWith(".xml")) {
-              try {
-                final content = String.fromCharCodes(file.content);
-                if (content.length < 15000) {
-                  extractedCode
-                      .writeln("\n--- FILE PATH: $fName ---\n$content\n");
-                  fileCount++;
-                }
-              } catch (e) {}
+            if (!file.name.contains("__MACOSX") && !file.name.startsWith(".")) {
+              allFileNames.add(file.name);
+
+              // 🕵️ DETECT TECHNOLOGY
+              if (file.name.endsWith('pubspec.yaml')) isFlutter = true;
+              if (file.name.endsWith('package.json')) isNodeOrReact = true;
+              if (file.name.endsWith('requirements.txt') ||
+                  file.name.endsWith('pyproject.toml')) isPython = true;
+              if (file.name.endsWith('index.html')) isWeb = true;
             }
           }
         }
+
+        // 2️⃣ STEP 2: DEFINE VIP FILES
+        String projectType = "Unknown";
+        List<String> priorityPatterns = [];
+
+        if (isFlutter) {
+          projectType = "Flutter/Dart";
+          priorityPatterns = [
+            "pubspec.yaml",
+            "lib/main.dart",
+            "lib/firebase_options.dart",
+            "android/app/build.gradle"
+          ];
+        } else if (isNodeOrReact) {
+          projectType = "React Native / Node.js";
+          priorityPatterns = [
+            "package.json",
+            "App.js",
+            "App.tsx",
+            "src/App.js",
+            "index.js",
+            "server.js"
+          ];
+        } else if (isPython) {
+          projectType = "Python";
+          priorityPatterns = [
+            "requirements.txt",
+            "app.py",
+            "main.py",
+            "manage.py",
+            "settings.py"
+          ];
+        } else if (isWeb) {
+          projectType = "HTML/Web";
+          priorityPatterns = [
+            "index.html",
+            "style.css",
+            "script.js",
+            "main.js"
+          ];
+        } else {
+          projectType = "General Code";
+          priorityPatterns = ["README.md", "main", "index"];
+        }
+
+        // 3️⃣ STEP 3: BUILD PROMPT
+        extractedCode.writeln("""
+        SYSTEM INSTRUCTION: You are an Expert Code Auditor specialized in $projectType.
+        
+        📊 **PROJECT METADATA:**
+        - Detected Language: $projectType
+        - Total Files: ${allFileNames.length}
+        - File List: ${allFileNames.join(", ")}
+        
+        🎯 **YOUR GOAL:**
+        1. Use the 'File List' to answer existence questions.
+        2. Analyze content below for bugs and logic.
+        
+        --- BEGIN CRITICAL FILE CONTENT ---
+        """);
+
+        // 4️⃣ STEP 4: EXTRACT CONTENT (Smart Priority)
+        int criticalFilesRead = 0;
+        int maxFilesToRead = 30;
+
+        // A. Read VIP Files First
+        for (String pattern in priorityPatterns) {
+          for (final file in archive) {
+            if (file.isFile &&
+                (file.name.endsWith(pattern) || file.name == pattern)) {
+              _addFileToContext(file, extractedCode);
+              criticalFilesRead++;
+            }
+          }
+        }
+
+        // B. Read Other Source Files
+        List<String> validExtensions = isFlutter
+            ? [".dart", ".yaml"]
+            : isNodeOrReact
+                ? [".js", ".ts", ".tsx", ".json"]
+                : isPython
+                    ? [".py", ".txt"]
+                    : isWeb
+                        ? [".html", ".css", ".js"]
+                        : [".txt", ".md"];
+
+        for (final file in archive) {
+          if (criticalFilesRead >= maxFilesToRead) break;
+
+          bool isValidExt =
+              validExtensions.any((ext) => file.name.endsWith(ext));
+          bool isNotAlreadyRead =
+              !priorityPatterns.any((p) => file.name.endsWith(p));
+
+          if (file.isFile && isValidExt && isNotAlreadyRead) {
+            _addFileToContext(file, extractedCode);
+            criticalFilesRead++;
+          }
+        }
+
         extractedCode.writeln("\n--- END OF CODEBASE ---");
 
         setState(() {
           _codebaseContext = extractedCode.toString();
           _isContextLoaded = true;
           _isLoading = false;
-          _addMessage("system",
-              "✅ Deep Scan Complete! Read $fileCount files from ZIP.");
+
+          _addMessage("system", """
+✅ **Analysis Complete!**
+🛠️ **Project Type:** $projectType
+📂 **Total Files:** ${allFileNames.length}
+🧠 **Analyzed:** $criticalFilesRead critical files.
+          """);
         });
       }
     } catch (e) {
       setState(() => _isLoading = false);
       _addMessage("system", "❌ Error: $e");
     }
+  }
+
+  void _addFileToContext(ArchiveFile file, StringBuffer buffer) {
+    try {
+      final content = String.fromCharCodes(file.content);
+      if (content.length < 30000) {
+        buffer.writeln("\n--- FILE: ${file.name} ---\n$content\n");
+      }
+    } catch (e) {}
   }
 
   // --- 2. GITHUB LINK LOGIC ---
@@ -692,60 +805,17 @@ class _RepoChatScreenState extends State<RepoChatScreen>
       context: context,
       builder: (c) => AlertDialog(
         backgroundColor: AppColors.cardSurface,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: AppColors.primaryAccent)),
-        title: const Text("Link GitHub Repo",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Enter public repository URL:",
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            const SizedBox(height: 10),
-            TextField(
-              controller: urlCtrl,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                  hintText: "https://github.com/user/repo",
-                  hintStyle: TextStyle(color: Colors.grey.shade700),
-                  filled: true,
-                  fillColor: Colors.black,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none)),
-            ),
-          ],
-        ),
+        title: const Text("GitHub Link", style: TextStyle(color: Colors.white)),
+        content: const Text(
+            "For accurate file counts, please use **Upload ZIP**.\nGitHub links are simulated.",
+            style: TextStyle(color: Colors.grey)),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(c),
-              child:
-                  const Text("Cancel", style: TextStyle(color: Colors.grey))),
-          ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryAccent,
-                  foregroundColor: Colors.black),
-              onPressed: () {
-                if (urlCtrl.text.isNotEmpty) {
-                  setState(() {
-                    _activeFileName = "GitHub Repo";
-                    _codebaseContext =
-                        "CONTEXT: The user is asking about the GitHub repository '${urlCtrl.text}'. Assume it is a standard Flutter project structure. Use your internal knowledge of Flutter patterns to answer.";
-                    _isContextLoaded = true;
-                    _addMessage(
-                        "system", "🔗 Repository Linked: ${urlCtrl.text}");
-                  });
-                  Navigator.pop(c);
-                }
-              },
-              child: const Text("Link & Analyze"))
+          TextButton(onPressed: () => Navigator.pop(c), child: const Text("OK"))
         ],
       ),
     );
   }
 
-  // --- SHOW OPTIONS MENU ---
   void _showUploadMenu() {
     showModalBottomSheet(
       context: context,
@@ -753,55 +823,33 @@ class _RepoChatScreenState extends State<RepoChatScreen>
       builder: (context) => Container(
         decoration: BoxDecoration(
             color: AppColors.cardSurface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-            border:
-                Border.all(color: AppColors.primaryAccent.withOpacity(0.3))),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(20))),
         padding: const EdgeInsets.all(20),
         child: Wrap(
           children: [
-            Center(
-                child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(2)))),
-            const SizedBox(height: 20),
             ListTile(
-              leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.2),
-                      shape: BoxShape.circle),
-                  child: const Icon(Icons.folder_zip, color: Colors.orange)),
-              title: const Text("Upload ZIP Project",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-              subtitle: const Text("Deep analysis of local files",
-                  style: TextStyle(color: Colors.grey)),
-              onTap: () {
-                Navigator.pop(context);
-                _pickZipFile();
-              },
-            ),
-            const Divider(color: Colors.white10),
+                leading: const Icon(Icons.folder_zip, color: Colors.orange),
+                title: const Text("Upload ZIP (Deep Audit)",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+                subtitle: const Text("Best for file counts & deep checks",
+                    style: TextStyle(color: Colors.grey)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickZipFile();
+                }),
             ListTile(
-              leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.2),
-                      shape: BoxShape.circle),
-                  child: const Icon(Icons.link, color: Colors.blue)),
-              title: const Text("GitHub Repository",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-              subtitle: const Text("Analyze public repo URL",
-                  style: TextStyle(color: Colors.grey)),
-              onTap: () {
-                Navigator.pop(context);
-                _addGitHubLink();
-              },
-            ),
+                leading: const Icon(Icons.link, color: Colors.blue),
+                title: const Text("GitHub Link",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+                subtitle: const Text("Quick remote check",
+                    style: TextStyle(color: Colors.grey)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _addGitHubLink();
+                }),
           ],
         ),
       ),
@@ -816,7 +864,8 @@ class _RepoChatScreenState extends State<RepoChatScreen>
 
     String fullPrompt = text;
     if (_isContextLoaded && _codebaseContext.isNotEmpty) {
-      fullPrompt = "$_codebaseContext\n\nUSER QUESTION: $text";
+      fullPrompt =
+          "$_codebaseContext\n\nUSER QUESTION: $text\n\nRULE: Answer STRICTLY based on the file content. Do not hallucinate features not present.";
     }
 
     String? res = await _brain.askLaravel(fullPrompt);
@@ -825,7 +874,7 @@ class _RepoChatScreenState extends State<RepoChatScreen>
     if (res != null) {
       _addMessage("ai", res);
     } else {
-      _addMessage("ai", "Brain Connection Error.");
+      _addMessage("ai", "Brain Error.");
     }
   }
 
@@ -851,70 +900,32 @@ class _RepoChatScreenState extends State<RepoChatScreen>
       icon: Icons.code,
       child: Column(
         children: [
-          // STATUS HEADER
           if (_activeFileName != null)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.green)),
-              child: Row(children: [
-                const Icon(Icons.verified, color: Colors.green, size: 18),
-                const SizedBox(width: 8),
-                Expanded(
-                    child: Text("Reading: $_activeFileName",
-                        style: const TextStyle(
-                            color: Colors.green, fontWeight: FontWeight.bold))),
-                InkWell(
-                    onTap: () {
-                      setState(() {
-                        _activeFileName = null;
-                        _codebaseContext = "";
-                        _isContextLoaded = false;
-                      });
-                    },
-                    child: const Icon(Icons.close, color: Colors.green))
-              ]),
-            ),
-
-          // CHAT AREA
+                padding: const EdgeInsets.all(8),
+                color: Colors.green.withOpacity(0.1),
+                child: Row(children: [
+                  const Icon(Icons.analytics, size: 16, color: Colors.green),
+                  const SizedBox(width: 8),
+                  Text("Auditing: $_activeFileName",
+                      style: const TextStyle(color: Colors.green))
+                ])),
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.all(16),
               itemCount: _msgs.length,
-              itemBuilder: (c, i) {
-                final msg = _msgs[i];
-                if (msg['role'] == 'system')
-                  return Center(
-                      child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Text(msg['text'],
-                              style: const TextStyle(
-                                  color: AppColors.primaryAccent,
-                                  fontWeight: FontWeight.bold))));
-
-                return ModernChatBubble(
-                  isUser: msg['role'] == 'user',
-                  text: msg['text'],
-                  isAnimated: msg['animated'],
-                  onAnimationEnd: () =>
-                      setState(() => _msgs[i]['animated'] = true),
-                );
-              },
+              itemBuilder: (c, i) => ModernChatBubble(
+                isUser: _msgs[i]['role'] == 'user',
+                text: _msgs[i]['text'],
+                isAnimated: _msgs[i]['animated'],
+                onAnimationEnd: () =>
+                    setState(() => _msgs[i]['animated'] = true),
+              ),
             ),
           ),
-
           if (_isLoading)
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: const LinearProgressIndicator(
-                    color: AppColors.primaryAccent,
-                    backgroundColor: Colors.transparent)),
-
-          // SLIDING SUGGESTIONS
+            const LinearProgressIndicator(color: AppColors.primaryAccent),
           Container(
             height: 40,
             margin: const EdgeInsets.only(bottom: 10),
@@ -936,34 +947,25 @@ class _RepoChatScreenState extends State<RepoChatScreen>
               },
             ),
           ),
-
-          // 🔥 NEON INPUT BOX WITH + MENU
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: NeonInputWrapper(
               child: Row(
                 children: [
-                  // ✅ PLUS ICON RESTORED
                   IconButton(
-                    icon: const Icon(Icons.add_circle,
-                        color: AppColors.primaryAccent),
-                    onPressed: _showUploadMenu, // Opens Menu
-                  ),
+                      icon: const Icon(Icons.add_circle,
+                          color: AppColors.primaryAccent),
+                      onPressed: _showUploadMenu),
                   Expanded(
-                    child: TextField(
-                      controller: _ctrl,
-                      style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600),
-                      decoration: const InputDecoration(
-                          hintText: "Ask about your code...",
-                          hintStyle: TextStyle(color: Colors.grey),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10)),
-                      onSubmitted: _send,
-                    ),
-                  ),
+                      child: TextField(
+                          controller: _ctrl,
+                          style: GoogleFonts.outfit(color: Colors.white),
+                          decoration: const InputDecoration(
+                              hintText: "Ask about code structure...",
+                              border: InputBorder.none,
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 10)),
+                          onSubmitted: _send)),
                   IconButton(
                       icon: const Icon(Icons.send_rounded,
                           color: AppColors.primaryAccent),
@@ -979,7 +981,7 @@ class _RepoChatScreenState extends State<RepoChatScreen>
 }
 
 // =============================================================================
-// 🔥 5. UI TO CODE SCREEN (SPLIT UI: GUIDE vs CODE)
+// 🔥 5. UI TO CODE SCREEN (TEACHER SPLIT UI)
 // =============================================================================
 
 class UIToCodeScreen extends StatefulWidget {
@@ -992,7 +994,6 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
   File? _image;
   bool _loading = false;
 
-  // 🔥 SPLIT DATA
   String _teacherGuide = "";
   String _codePart = "";
 
@@ -1031,7 +1032,6 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
       _codePart = "";
     });
 
-    // 🔥 SPLIT PROMPT
     String prompt = """
     You are an expert Flutter Instructor.
     Look at this UI screenshot and write the code.
@@ -1077,13 +1077,7 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
       icon: Icons.image_aspect_ratio_rounded,
       child: Column(
         children: [
-          // 1. IMAGE PREVIEW
-          if (_codePart.isEmpty)
-            Expanded(
-              flex: 2,
-              child: _buildImageSection(),
-            ),
-
+          if (_codePart.isEmpty) Expanded(flex: 2, child: _buildImageSection()),
           if (_loading)
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -1097,8 +1091,6 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
                 ],
               ),
             ),
-
-          // 2. RESULT SECTION (SCROLLABLE)
           if (_teacherGuide.isNotEmpty || _codePart.isNotEmpty)
             Expanded(
               flex: 3,
@@ -1108,7 +1100,6 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 🅰️ TEACHER GUIDE (WHITE TEXT)
                     if (_teacherGuide.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -1130,18 +1121,14 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
                                       fontWeight: FontWeight.bold))
                             ]),
                             const SizedBox(height: 10),
-                            Text(
-                              _teacherGuide,
-                              style: GoogleFonts.outfit(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  height: 1.5),
-                            ),
+                            Text(_teacherGuide,
+                                style: GoogleFonts.outfit(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    height: 1.5)),
                           ],
                         ),
                       ),
-
-                    // 🅱️ CODE BOX (BLACK & NEON)
                     if (_codePart.isNotEmpty)
                       Container(
                         width: double.infinity,
@@ -1153,7 +1140,6 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Header
                             Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 10),
@@ -1201,16 +1187,13 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
                               ),
                             ),
                             const Divider(height: 1, color: Colors.grey),
-                            // Code Body
                             Padding(
                               padding: const EdgeInsets.all(16),
-                              child: Text(
-                                _codePart,
-                                style: GoogleFonts.firaCode(
-                                    color: const Color(0xFFCCFF00),
-                                    fontSize: 12,
-                                    height: 1.4), // Neon Green Code
-                              ),
+                              child: Text(_codePart,
+                                  style: GoogleFonts.firaCode(
+                                      color: const Color(0xFFCCFF00),
+                                      fontSize: 12,
+                                      height: 1.4)),
                             ),
                           ],
                         ),
@@ -1224,7 +1207,6 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
     );
   }
 
-  // Helper Widget for Image Upload UI
   Widget _buildImageSection() {
     return Container(
       width: double.infinity,
@@ -1273,7 +1255,7 @@ class _UIToCodeScreenState extends State<UIToCodeScreen> {
                   right: 20,
                   left: 20,
                   child: ElevatedButton(
-                    onPressed: _generateCode, // Generate Trigger
+                    onPressed: _generateCode,
                     style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryAccent,
                         padding: const EdgeInsets.all(15)),
@@ -1756,7 +1738,7 @@ class _NeonInputWrapperState extends State<NeonInputWrapper>
         return Container(
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(30), // ROUNDED
               gradient: SweepGradient(
                 colors: const [
                   AppColors.primaryAccent,
