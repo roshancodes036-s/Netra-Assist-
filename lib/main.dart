@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // ✅ Added for Web Fix
+import 'package:flutter/foundation.dart' show kIsWeb; // ✅ Web Fix
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 
@@ -179,10 +179,9 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ REAL WORKING SCREENS LIST
     final List<Widget> screens = [
       HomeScreen(onNavigate: _changeScreen, isDevMode: _isDevMode), // 0
-      const RepoChatScreen(), // 1 (SUPERCHARGED ZIP CHAT)
+      const RepoChatScreen(), // 1 (UPDATED TO ULTRA VERSION)
       const TemplatesScreen(), // 2
       const ErrorFixerScreen(), // 3
       const UIToCodeScreen(), // 4
@@ -549,7 +548,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 // =============================================================================
-// 🔥 4. REPO CHAT SCREEN (SUPERCHARGED: ZIP, WEB FIX, TYPEWRITER, SUGGESTIONS)
+// 🔥 4. REPO CHAT SCREEN (ULTRA: DEEP ANALYSIS + NEON UI)
 // =============================================================================
 
 class RepoChatScreen extends StatefulWidget {
@@ -558,7 +557,8 @@ class RepoChatScreen extends StatefulWidget {
   State<RepoChatScreen> createState() => _RepoChatScreenState();
 }
 
-class _RepoChatScreenState extends State<RepoChatScreen> {
+class _RepoChatScreenState extends State<RepoChatScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _ctrl = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<Map<String, dynamic>> _msgs = [];
@@ -568,33 +568,21 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
   String _codebaseContext = "";
   bool _isContextLoaded = false;
 
-  // AI Brain
   final AIBrain _brain = AIBrain();
 
-  // Sliding Suggestions Logic
+  // Sliding Suggestions
   late ScrollController _suggestionsController;
   late Timer _suggestionTimer;
   final List<String> _suggestions = [
-    "Explain the main.dart file flow",
-    "Where is the login logic located?",
-    "Find bugs in my pubspec.yaml",
-    "How to optimize the list view?",
-    "Write a unit test for the API service",
-    "Explain the project structure",
-    "Refactor the home screen code",
-    "Add comments to the complex logic",
-    "Check for memory leaks",
-    "Generate a README.md file",
-    "Where are the colors defined?",
-    "Help me add a new feature",
-    "Debug the white screen error",
-    "Convert this UI to dark mode",
-    "Explain the state management used",
-    "Is the Firebase setup correct?",
-    "Create a release APK build",
-    "Optimize image assets",
-    "Fix the overflow error",
-    "Add animation to the button"
+    "🔥 Analyze features from code",
+    "🐛 Find bugs in main.dart",
+    "🚀 How to optimize ListView?",
+    "🛠️ Refactor this logic",
+    "📱 Explain the UI structure",
+    "📦 Check pubspec.yaml dependencies",
+    "🎨 Change theme to Dark Mode",
+    "🔐 Where is the API Key?",
+    "🧹 Clean up unused code"
   ];
 
   @override
@@ -603,25 +591,25 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
     _brain.initBrain();
     _suggestionsController = ScrollController();
 
-    // Auto Scroll Suggestions
+    // Auto Scroll Suggestions (Smooth)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _startAutoScroll();
     });
 
     _addMessage("ai",
-        "Hello Developer! 🚀\nUpload a ZIP file or link a Repo. I will analyze every single line of code and answer your questions.");
+        "Hello! 👋\nI am ready for **DEEP ANALYSIS**.\n\nUpload your ZIP file. I will read every line of code to find features, bugs, and logic. No guessing.");
   }
 
   void _startAutoScroll() {
     _suggestionTimer =
         Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (_suggestionsController.hasClients) {
-        double maxScroll = _suggestionsController.position.maxScrollExtent;
-        double currentScroll = _suggestionsController.offset;
-        if (currentScroll >= maxScroll) {
+        double max = _suggestionsController.position.maxScrollExtent;
+        double current = _suggestionsController.offset;
+        if (current >= max) {
           _suggestionsController.jumpTo(0);
         } else {
-          _suggestionsController.jumpTo(currentScroll + 1);
+          _suggestionsController.jumpTo(current + 1);
         }
       }
     });
@@ -636,13 +624,13 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
     super.dispose();
   }
 
-  // --- 📂 ZIP FILE PICKER (WEB FIXED + DEEP ANALYSIS) ---
+  // --- 📂 ZIP DEEP READ LOGIC ---
   Future<void> _pickZipFile() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['zip'],
-        withData: true, // ✅ IMPORTANT FOR WEB
+        withData: true,
       );
 
       if (result != null) {
@@ -652,8 +640,6 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
         });
 
         List<int> bytes;
-
-        // ✅ WEB VS MOBILE FIX
         if (kIsWeb) {
           bytes = result.files.single.bytes!;
         } else {
@@ -661,109 +647,58 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
           bytes = await file.readAsBytes();
         }
 
-        // Decode ZIP
         final archive = ZipDecoder().decodeBytes(bytes);
         StringBuffer extractedCode = StringBuffer();
+
+        // 🔥 STRICT INSTRUCTION FOR AI
         extractedCode.writeln(
-            "INSTRUCTION: You are an AI code analyzer. Here is the full codebase content. Use this to answer specific questions, find files, and write code based on this context.\n\n--- BEGIN CODEBASE ---");
+            "SYSTEM INSTRUCTION: You are a Senior Flutter Engineer. The user has uploaded their project code below. \n\nRULES:\n1. READ the code context carefully.\n2. DO NOT GUESS features based on file names. Look for actual implementation (e.g., if you see 'CameraPreview', say Camera is a feature).\n3. If asked for code, provide it in code blocks.\n4. If asked for bugs, highlight them.\n\n--- START OF CODEBASE ---");
 
         int fileCount = 0;
-
         for (final file in archive) {
           if (file.isFile) {
             final fName = file.name;
-            // Only read code files (Ignore images/builds)
             if (fName.endsWith(".dart") ||
                 fName.endsWith(".yaml") ||
-                fName.endsWith(".xml") ||
-                fName.endsWith(".json") ||
-                fName.endsWith(".js") ||
-                fName.endsWith(".html")) {
+                fName.endsWith(".xml")) {
               try {
                 final content = String.fromCharCodes(file.content);
-                // Safety check for size
-                if (content.length < 20000) {
-                  extractedCode.writeln("\n\n--- FILE: $fName ---\n$content");
+                // Protecting against huge files
+                if (content.length < 15000) {
+                  extractedCode
+                      .writeln("\n--- FILE PATH: $fName ---\n$content\n");
                   fileCount++;
                 }
-              } catch (e) {
-                // Ignore binary/non-text files
-              }
+              } catch (e) {}
             }
           }
         }
-
-        extractedCode.writeln("\n--- END CODEBASE ---");
+        extractedCode.writeln("\n--- END OF CODEBASE ---");
 
         setState(() {
           _codebaseContext = extractedCode.toString();
           _isContextLoaded = true;
           _isLoading = false;
           _addMessage("system",
-              "✅ Analysis Complete! I have read $fileCount files from $_activeFileName. Ask me to show any code or explain logic.");
+              "✅ Deep Scan Complete! Read $fileCount files. I now know every line of your code.");
         });
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      _addMessage("system", "❌ Error reading ZIP: $e");
+      _addMessage("system", "❌ Error: $e");
     }
   }
 
-  // --- 🔗 GITHUB LINK ---
-  void _addGitHubLink() {
-    TextEditingController urlCtrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (c) => AlertDialog(
-        backgroundColor: AppColors.cardSurface,
-        title: const Text("GitHub Repository",
-            style: TextStyle(color: Colors.white)),
-        content: TextField(
-          controller: urlCtrl,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-              hintText: "https://github.com/username/repo",
-              hintStyle: TextStyle(color: Colors.grey)),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(c), child: const Text("Cancel")),
-          ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryAccent),
-              onPressed: () {
-                if (urlCtrl.text.isNotEmpty) {
-                  setState(() {
-                    _activeFileName = "GitHub Repo";
-                    _codebaseContext =
-                        "CONTEXT: The user is asking about the GitHub repository '${urlCtrl.text}'. Assume it is a standard Flutter project. If they ask for generic code, provide standard Flutter examples.";
-                    _isContextLoaded = true;
-                    _addMessage("system",
-                        "🔗 Repository Linked! I'm ready to discuss structure and logic.");
-                  });
-                  Navigator.pop(c);
-                }
-              },
-              child:
-                  const Text("Analyze", style: TextStyle(color: Colors.black)))
-        ],
-      ),
-    );
-  }
-
-  // --- 💬 SEND MESSAGE ---
   void _send(String text) async {
     if (text.isEmpty) return;
     _ctrl.clear();
     _addMessage("user", text);
-
     setState(() => _isLoading = true);
 
     String fullPrompt = text;
-    // Inject Context if loaded
     if (_isContextLoaded && _codebaseContext.isNotEmpty) {
-      fullPrompt =
-          "$_codebaseContext\n\nUser Question: $text\n\nProvide a detailed answer with code blocks where necessary.";
+      // Sending full context for accurate analysis
+      fullPrompt = "$_codebaseContext\n\nUSER QUESTION: $text";
     }
 
     String? res = await _brain.askLaravel(fullPrompt);
@@ -772,8 +707,7 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
     if (res != null) {
       _addMessage("ai", res);
     } else {
-      _addMessage(
-          "ai", "Sorry, I encountered an error connecting to the brain.");
+      _addMessage("ai", "Brain Connection Error.");
     }
   }
 
@@ -781,7 +715,6 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
     setState(() {
       _msgs.add({"role": role, "text": text, "animated": false});
     });
-    // Auto scroll to bottom
     Future.delayed(const Duration(milliseconds: 100), () {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -797,45 +730,38 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
   Widget build(BuildContext context) {
     return ProPageLayout(
       title: "Repo Chat",
-      icon: Icons.folder_zip_rounded,
+      icon: Icons.code,
       child: Column(
         children: [
-          // 1. STATUS BAR
+          // STATUS HEADER
           if (_activeFileName != null)
-            ProCard(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(children: [
-                  const Icon(Icons.check_circle,
-                      color: AppColors.primaryAccent, size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: Text(_activeFileName!,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis)),
-                  IconButton(
-                      icon:
-                          const Icon(Icons.close, color: Colors.red, size: 20),
-                      onPressed: () => setState(() {
-                            _activeFileName = null;
-                            _isContextLoaded = false;
-                            _codebaseContext = "";
-                          }))
-                ]))
-          else
             Container(
-                padding: const EdgeInsets.all(20),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.borderSubtle),
-                    borderRadius: BorderRadius.circular(16)),
-                child: const Text("No Repository Loaded",
-                    style: TextStyle(color: Colors.grey),
-                    textAlign: TextAlign.center)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.green)),
+              child: Row(children: [
+                const Icon(Icons.verified, color: Colors.green, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: Text("Reading: $_activeFileName",
+                        style: const TextStyle(
+                            color: Colors.green, fontWeight: FontWeight.bold))),
+                InkWell(
+                    onTap: () {
+                      setState(() {
+                        _activeFileName = null;
+                        _codebaseContext = "";
+                        _isContextLoaded = false;
+                      });
+                    },
+                    child: const Icon(Icons.close, color: Colors.green))
+              ]),
+            ),
 
-          const SizedBox(height: 10),
-
-          // 2. CHAT LIST
+          // CHAT AREA
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -843,24 +769,21 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
               itemCount: _msgs.length,
               itemBuilder: (c, i) {
                 final msg = _msgs[i];
-                if (msg['role'] == 'system') {
+                if (msg['role'] == 'system')
                   return Center(
                       child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(10),
                           child: Text(msg['text'],
                               style: const TextStyle(
                                   color: AppColors.primaryAccent,
-                                  fontSize: 12))));
-                }
-                return ChatBubble(
+                                  fontWeight: FontWeight.bold))));
+
+                return ModernChatBubble(
                   isUser: msg['role'] == 'user',
                   text: msg['text'],
                   isAnimated: msg['animated'],
-                  onAnimationEnd: () {
-                    setState(() {
-                      _msgs[i]['animated'] = true;
-                    });
-                  },
+                  onAnimationEnd: () =>
+                      setState(() => _msgs[i]['animated'] = true),
                 );
               },
             ),
@@ -868,94 +791,65 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
 
           if (_isLoading)
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: AppColors.primaryAccent)),
-                    SizedBox(width: 10),
-                    Text("Analyzing codebase...",
-                        style: TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12))
-                  ]),
-            ),
+                padding: const EdgeInsets.all(8.0),
+                child: const LinearProgressIndicator(
+                    color: AppColors.primaryAccent,
+                    backgroundColor: Colors.transparent)),
 
-          // 3. SLIDING SUGGESTIONS
+          // SLIDING SUGGESTIONS
           Container(
             height: 40,
-            margin: const EdgeInsets.only(bottom: 8),
+            margin: const EdgeInsets.only(bottom: 10),
             child: ListView.builder(
               controller: _suggestionsController,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
-                final suggestion = _suggestions[index % _suggestions.length];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
                   child: ActionChip(
                     backgroundColor: AppColors.cardSurface,
-                    side: BorderSide.none,
-                    label: Text(suggestion,
+                    label: Text(_suggestions[index % _suggestions.length],
                         style: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 11)),
-                    onPressed: () => _send(suggestion),
+                            color: Colors.white, fontWeight: FontWeight.w600)),
+                    onPressed: () =>
+                        _send(_suggestions[index % _suggestions.length]),
                   ),
                 );
               },
             ),
           ),
 
-          // 4. INPUT BAR
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-                color: AppColors.cardSurface,
-                border: Border(top: BorderSide(color: AppColors.borderSubtle))),
-            child: Row(
-              children: [
-                IconButton(
-                    icon: const Icon(Icons.add_circle,
-                        color: AppColors.primaryAccent, size: 28),
-                    onPressed: () {
-                      showModalBottomSheet(
-                          context: context,
-                          backgroundColor: AppColors.cardSurface,
-                          builder: (c) => Wrap(children: [
-                                ListTile(
-                                    leading: const Icon(Icons.folder_zip,
-                                        color: Colors.orange),
-                                    title: const Text("Upload ZIP Project"),
-                                    onTap: () {
-                                      Navigator.pop(c);
-                                      _pickZipFile();
-                                    }),
-                                ListTile(
-                                    leading: const Icon(Icons.link,
-                                        color: Colors.blue),
-                                    title: const Text("GitHub Link"),
-                                    onTap: () {
-                                      Navigator.pop(c);
-                                      _addGitHubLink();
-                                    }),
-                              ]));
-                    }),
-                const SizedBox(width: 10),
-                Expanded(
+          // 🔥 NEON INPUT BOX
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: NeonInputWrapper(
+              child: Row(
+                children: [
+                  IconButton(
+                      icon: const Icon(Icons.add_circle,
+                          color: AppColors.primaryAccent),
+                      onPressed: _pickZipFile),
+                  Expanded(
                     child: TextField(
-                        controller: _ctrl,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                            hintText: "Ask specific code questions...",
-                            border: InputBorder.none),
-                        onSubmitted: _send)),
-                IconButton(
-                    icon:
-                        const Icon(Icons.send, color: AppColors.primaryAccent),
-                    onPressed: () => _send(_ctrl.text))
-              ],
+                      controller: _ctrl,
+                      style: GoogleFonts.outfit(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600), // BOLD & WHITE
+                      decoration: const InputDecoration(
+                          hintText: "Ask about your code...",
+                          hintStyle: TextStyle(color: Colors.grey),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10)),
+                      onSubmitted: _send,
+                    ),
+                  ),
+                  IconButton(
+                      icon: const Icon(Icons.send_rounded,
+                          color: AppColors.primaryAccent),
+                      onPressed: () => _send(_ctrl.text)),
+                ],
+              ),
             ),
           )
         ],
@@ -965,7 +859,7 @@ class _RepoChatScreenState extends State<RepoChatScreen> {
 }
 
 // =============================================================================
-// 🔥 5. UI TO CODE SCREEN (WORKING IMAGE PICKER)
+// 🔥 5. UI TO CODE SCREEN
 // =============================================================================
 
 class UIToCodeScreen extends StatefulWidget {
@@ -1407,7 +1301,7 @@ class UpgradeScreen extends StatelessWidget {
 }
 
 // =============================================================================
-// UI HELPERS (AND NEW CHAT BUBBLE)
+// UI HELPERS
 // =============================================================================
 
 class ProCard extends StatelessWidget {
@@ -1491,14 +1385,70 @@ Widget _buildProInput(String hint) {
   );
 }
 
-// ✨ NEW: CHAT BUBBLE WITH TYPEWRITER EFFECT
-class ChatBubble extends StatefulWidget {
+// =============================================================================
+// ✨ MODERN UI COMPONENTS (BOLD, WHITE, NEON)
+// =============================================================================
+
+class NeonInputWrapper extends StatefulWidget {
+  final Widget child;
+  const NeonInputWrapper({super.key, required this.child});
+  @override
+  State<NeonInputWrapper> createState() => _NeonInputWrapperState();
+}
+
+class _NeonInputWrapperState extends State<NeonInputWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 3))
+          ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30), // ROUNDED
+              gradient: SweepGradient(
+                colors: const [
+                  AppColors.primaryAccent,
+                  Colors.transparent,
+                  AppColors.primaryAccent
+                ],
+                transform: GradientRotation(_controller.value * 6.28),
+              )),
+          child: Container(
+            decoration: BoxDecoration(
+                color: AppColors.cardSurface,
+                borderRadius: BorderRadius.circular(28)),
+            child: widget.child,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ModernChatBubble extends StatefulWidget {
   final bool isUser;
   final String text;
   final bool isAnimated;
   final VoidCallback onAnimationEnd;
 
-  const ChatBubble(
+  const ModernChatBubble(
       {super.key,
       required this.isUser,
       required this.text,
@@ -1506,10 +1456,10 @@ class ChatBubble extends StatefulWidget {
       required this.onAnimationEnd});
 
   @override
-  State<ChatBubble> createState() => _ChatBubbleState();
+  State<ModernChatBubble> createState() => _ModernChatBubbleState();
 }
 
-class _ChatBubbleState extends State<ChatBubble> {
+class _ModernChatBubbleState extends State<ModernChatBubble> {
   String _displayedText = "";
   late Timer _timer;
   int _charIndex = 0;
@@ -1525,14 +1475,13 @@ class _ChatBubbleState extends State<ChatBubble> {
   }
 
   void _startTypewriter() {
-    _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 5), (timer) {
       if (_charIndex < widget.text.length) {
-        if (mounted) {
+        if (mounted)
           setState(() {
             _displayedText += widget.text[_charIndex];
             _charIndex++;
           });
-        }
       } else {
         _timer.cancel();
         widget.onAnimationEnd();
@@ -1548,65 +1497,86 @@ class _ChatBubbleState extends State<ChatBubble> {
 
   @override
   Widget build(BuildContext context) {
-    bool isCode = widget.text.contains("class ") ||
-        widget.text.contains("void ") ||
-        widget.text.contains("import ");
+    // Parse for Code Blocks (``` ... ```)
+    List<String> parts = _displayedText.split('```');
 
     return Align(
       alignment: widget.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.85),
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
         decoration: BoxDecoration(
-          color: widget.isUser
-              ? AppColors.primaryAccent.withOpacity(0.2)
-              : AppColors.cardSurface,
+          color:
+              widget.isUser ? AppColors.primaryAccent : AppColors.cardSurface,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: widget.isUser ? const Radius.circular(16) : Radius.zero,
+            topLeft: const Radius.circular(20),
+            topRight: const Radius.circular(20),
+            bottomLeft: widget.isUser ? const Radius.circular(20) : Radius.zero,
             bottomRight:
-                widget.isUser ? Radius.zero : const Radius.circular(16),
+                widget.isUser ? Radius.zero : const Radius.circular(20),
           ),
-          border: Border.all(
-              color: widget.isUser
-                  ? AppColors.primaryAccent.withOpacity(0.5)
-                  : AppColors.borderSubtle),
         ),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(_displayedText,
-                style: GoogleFonts.firaCode(
-                    color: widget.isUser
-                        ? Colors.white
-                        : (isCode
-                            ? AppColors.primaryAccent
-                            : AppColors.textSecondary),
-                    fontSize: 13,
-                    height: 1.4)),
-            if (!widget.isUser && widget.text.length == _displayedText.length)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: widget.text));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Copied to clipboard!"),
-                                duration: Duration(milliseconds: 800)));
-                      },
-                      child: const Icon(Icons.copy_rounded,
-                          size: 16, color: Colors.grey),
+            if (widget.isUser)
+              Text(_displayedText,
+                  style: GoogleFonts.outfit(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16))
+            else
+              ...parts.map((part) {
+                int index = parts.indexOf(part);
+                if (index % 2 == 0) {
+                  // Normal Text (BOLD WHITE)
+                  return Text(part,
+                      style: GoogleFonts.outfit(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          height: 1.5));
+                } else {
+                  // Code Block (Colored)
+                  return Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade800)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text("CODE",
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 10)),
+                              InkWell(
+                                  onTap: () {
+                                    Clipboard.setData(
+                                        ClipboardData(text: part));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text("Copied!")));
+                                  },
+                                  child: const Icon(Icons.copy,
+                                      color: Colors.white, size: 14))
+                            ]),
+                        const Divider(color: Colors.grey),
+                        Text(part.trim(),
+                            style: GoogleFonts.firaCode(
+                                color: AppColors.primaryAccent, fontSize: 13)),
+                      ],
                     ),
-                  ],
-                ),
-              )
+                  );
+                }
+              }),
           ],
         ),
       ),
