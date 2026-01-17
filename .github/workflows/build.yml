@@ -13,6 +13,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Java 17 (Standard)
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -27,12 +28,12 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      # यह है नया फिक्स (New Fix)
-      # हम GitHub के कंप्यूटर में मौजूद Gradle का यूज़ करके फाइल बनाएंगे
-      - name: Generate Missing Gradle Wrapper
+      # यहाँ हमने बदलाव किया है: हम जानबूझकर Gradle 8.0 मांग रहे हैं
+      # यह वर्ज़न पुराने प्लगइन्स (जैसे speech_to_text) के साथ भी प्यार से काम करता है
+      - name: Generate Compatible Gradle Wrapper
         run: |
           cd android
-          gradle wrapper
+          gradle wrapper --gradle-version 8.2 --distribution-type all
           chmod +x gradlew
 
       - name: Build APK (Debug)
