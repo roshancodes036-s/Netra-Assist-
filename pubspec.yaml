@@ -28,7 +28,7 @@ dependencies:
 
   # Voice, Files & Utilities
   flutter_tts: ^3.8.3
-  speech_to_text: ^6.6.0
+  speech_to_text: ^7.3.0
   file_picker: ^10.3.8
   permission_handler: ^11.0.1
   image_picker: ^1.0.4
