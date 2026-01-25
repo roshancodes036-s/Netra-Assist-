@@ -13,12 +13,12 @@
 
 | **👁️ Netra Vision Mode** | **💻 Developer Dashboard** |
 |:---:|:---:|
-| <img src="https://raw.githubusercontent.com/roshancodes036-sudo/CodeNetra-Flutter-AI/main/netra_home.png" height="450"> | <img src="https://raw.githubusercontent.com/roshancodes036-sudo/CodeNetra-Flutter-AI/main/dev_home.png" height="450"> |
+| <img src="netra_home.png" height="450"> | <img src="dev_home.png" height="450"> |
 | **Identifies Objects & Currency** | **Central Hub for Coding Tools** |
 
 | **🎨 UI to Code Engine** | **🐞 AI Error Debugger** |
 |:---:|:---:|
-| <img src="https://raw.githubusercontent.com/roshancodes036-sudo/CodeNetra-Flutter-AI/main/ui_to_code.png" height="450"> | <img src="https://raw.githubusercontent.com/roshancodes036-sudo/CodeNetra-Flutter-AI/main/debugger.png" height="450"> |
+| <img src="ui_to_code.png" height="450"> | <img src="debugger.png" height="450"> |
 | **Converts Design to Flutter Code** | **Fixes Logic Errors Instantly** |
 
 ---
@@ -113,9 +113,12 @@ A coding companion designed for **Blind Creators** AND **Pro Developers**:
 git clone [https://github.com/roshancodes036-sudo/CodeNetra-Flutter-AI.git](https://github.com/roshancodes036-sudo/CodeNetra-Flutter-AI.git)
 cd CodeNetra-Flutter-AI
 
-2.Get Gemini 3 API Key:
+2. Get Gemini 3 API Key:
+
 Sign up at Google AI Studio.
+
 Open lib/ai_logic.dart (or your config file).
+
 Replace the placeholder with your key:
 const String _apiKey = 'YOUR_API_KEY_HERE';
 
@@ -129,4 +132,3 @@ Engineered by Roshan Chaurasiya
 📍 Varanasi, India
 
 🚀 Built to showcase the power of Google Gemini 3.
-
