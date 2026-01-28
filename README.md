@@ -171,4 +171,3 @@ Roshan Chaurasiya
 
 Built with ❤️ to showcase the real-world impact of Google Gemini 3.
 
-

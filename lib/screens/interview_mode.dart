@@ -20,7 +20,7 @@ class _InterviewScreenState extends State<InterviewScreen> {
   final AIBrain _brain = AIBrain();
   final ScrollController _scrollController = ScrollController();
 
-  List<Map<String, String>> _chat = [];
+  final List<Map<String, String>> _chat = [];
   bool _isListening = false;
   bool _isProcessing = false;
   String _statusText = "Tap Mic to Start";

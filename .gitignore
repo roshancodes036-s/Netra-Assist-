@@ -59,3 +59,4 @@ linux/flutter/ephemeral/
 /linux/ephemeral/
 /linux/CMakeLists.txt.user
 /linux/compile_commands.json
+lib/services/ai_logic.dart
