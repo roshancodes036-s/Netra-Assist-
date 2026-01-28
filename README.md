@@ -151,23 +151,25 @@ Unlike single-purpose AI apps, CodeNetra-AI combines:
 ```bash
 git clone https://github.com/roshancodes036-sudo/CodeNetra-Flutter-AI.git
 cd CodeNetra-Flutter-AI
+```
 
-2. Add Gemini API Key
+### 2. Add Gemini API Key
 
 Open:
-lib/ai_logic.dart
+`lib/ai_logic.dart`
 
 Replace
-const String apiKey = "YOUR_API_KEY_HERE";
+`const String apiKey = "YOUR_API_KEY_HERE";`
 
-3. Install & Run
+### 3. Install & Run
+```bash
 flutter pub get
 flutter run
+```
 
-👨‍💻 Author
+### 👨‍💻 Author
 
-Roshan Chaurasiya
+**Roshan Chaurasiya**
 📍 Varanasi, India
 
 Built with ❤️ to showcase the real-world impact of Google Gemini 3.
-

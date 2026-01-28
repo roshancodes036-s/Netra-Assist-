@@ -59,6 +59,9 @@ linux/flutter/ephemeral/
 /linux/ephemeral/
 /linux/CMakeLists.txt.user
 /linux/compile_commands.json
+<<<<<<< HEAD
 lib/services/ai_logic.dart
 lib/firebase_options.dart
 **/firebase_options.dart
+=======
+>>>>>>> 832c7bd3bcb96f9109cb044a4194ff3dd0a9c4c9
