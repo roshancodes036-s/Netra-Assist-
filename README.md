@@ -103,6 +103,165 @@ A Gemini-powered coding assistant for creators and engineers:
 
 ---
 
+---
+
+# 📌 Feature Breakdown (What Each Tool Does)
+
+CodeNetra-AI includes two dedicated modes.  
+Below is a clear explanation of what every feature actually does:
+
+---
+
+## 👁️ Netra Vision Mode — Accessibility Suite
+
+Designed for visually impaired users to interact with the world using Gemini Vision + Voice.
+
+### 📍 Dashboard
+The central home screen that provides quick access to all accessibility tools.
+
+---
+
+### 🎥 Live Vision
+Uses the phone camera in real-time and Gemini 3 Vision to:
+
+- detect objects in front of the user  
+- identify obstacles and hazards  
+- narrate the surroundings using voice output  
+
+Example:  
+> “There is a car ahead, please move left.”
+
+---
+
+### 🎙️ Voice Assistant
+A fully voice-controlled AI companion that allows users to:
+
+- ask questions without typing  
+- get spoken answers instantly  
+- navigate the app hands-free  
+
+Example:  
+> “What is in front of me?”  
+> “Read this document.”
+
+---
+
+### 📄 PDF Intelligence
+Allows users to upload PDFs and Gemini will:
+
+- read long documents  
+- summarize content  
+- explain complex text in simple language  
+- provide audio narration for blind users  
+
+Example:  
+> “Explain this PDF in Hindi.”
+
+---
+
+### ❓ Visual Q&A
+Users can capture or upload an image and ask:
+
+- “What is written here?”  
+- “What object is this?”  
+- “Is this safe to use?”  
+
+Gemini responds with intelligent vision-based answers.
+
+---
+
+### 🙂 Face & Emotion Scan
+Detects facial expressions and emotional cues to help users understand:
+
+- whether a person looks happy, sad, or angry  
+- basic social awareness in conversations  
+
+---
+
+---
+
+## 💻 Developer Mode — AI Coding Productivity Suite
+
+Built for developers to code faster using Gemini reasoning + long context.
+
+---
+
+### 📍 Dashboard
+The developer home hub for accessing all engineering tools.
+
+---
+
+### 📂 Repo Chat
+Upload an entire project ZIP file and ask Gemini:
+
+- explain the codebase structure  
+- understand authentication flow  
+- locate important files instantly  
+
+Example:  
+> “Where is the login logic implemented?”
+
+---
+
+### 🎨 UI to Code
+Converts any UI screenshot or design into working code:
+
+- Flutter widgets  
+- React Native components  
+- HTML + Tailwind layouts  
+
+Example:  
+> “Generate Flutter code for this screen.”
+
+---
+
+### 🐞 Error Debugger
+Paste any error log or stack trace and Gemini will:
+
+- identify the root cause  
+- explain the issue  
+- suggest the exact fix  
+
+Example:  
+> “Fix this Flutter build error.”
+
+---
+
+### 🏗️ System Architect
+Helps developers design scalable apps by generating:
+
+- clean architecture suggestions  
+- folder structure guidance  
+- best practices for large projects  
+
+Example:  
+> “Design a Firebase + Flutter architecture.”
+
+---
+
+### 🎤 Mock Interview
+An AI interview simulator for developers that provides:
+
+- real technical questions  
+- instant feedback  
+- spoken interview practice  
+
+Example:  
+> “Take my Flutter developer interview.”
+
+---
+
+# ⭐ Summary
+
+CodeNetra-AI is unique because it combines:
+
+- **Accessibility Vision Assistance**
+- **Developer Engineering Intelligence**
+- **Gemini 3 Multimodal Reasoning**
+- **Voice-first Inclusive AI Experience**
+
+---
+
 # ⚡ Why Gemini 3?
 
 CodeNetra-AI is built specifically to showcase Gemini 3 strengths:
