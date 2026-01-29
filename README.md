@@ -1,5 +1,5 @@
 # 👁️ CodeNetra-AI — Gemini 3 Inclusive Vision + Developer Intelligence Suite  
-> **Gemini 3 Hackathon Submission**  
+> **Gemini 3 Submission**  
 > *One Platform. Two Modes. Accessibility + Developer Productivity powered by Gemini 3.*
 
 ![Gemini](https://img.shields.io/badge/Powered%20by-Gemini%203.0-8E75B2?style=for-the-badge&logo=google&logoColor=white)
