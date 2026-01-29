@@ -1,10 +1,10 @@
 # 👁️ CodeNetra-AI — Gemini 3 Inclusive Vision + Developer Intelligence Suite  
-> **Gemini 3 Submission**  
+> **Gemini 3 Hackathon Submission**  
 > *One Platform. Two Modes. Accessibility + Developer Productivity powered by Gemini 3.*
 
 ![Gemini](https://img.shields.io/badge/Powered%20by-Gemini%203.0-8E75B2?style=for-the-badge&logo=google&logoColor=white)
 ![Flutter](https://img.shields.io/badge/Built%20with-Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
-![Hackathon](https://img.shields.io/badge/Hackathon-Gemini%203%20Finalist%20Project-FFCA28?style=for-the-badge)
+![Hackathon](https://img.shields.io/badge/Hackathon-Gemini%203%20Submission-FFCA28?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 ---
@@ -18,18 +18,34 @@ It is designed for two high-impact communities:
 ### 👁️ Netra Vision Mode (Primary Social Impact)
 AI-powered “Digital Eyes” for visually impaired users.
 
-### 💻 Developer Mode (Engineering Productivity)
-AI coding intelligence suite for developers and creators.
+### 💻 Developer Mode (Secondary Productivity Showcase)
+AI coding intelligence suite for developers using Gemini long-context reasoning.
 
-> **CodeNetra-AI proves Gemini 3’s true power: Vision + Voice + Long Context Reasoning.**
+> **CodeNetra-AI demonstrates Gemini 3’s true power: Vision + Voice + Long Context Reasoning.**
 
 ---
 
 # 🔥 Innovation in 3 Lines (Judge Summary)
 
-✅ **Real-time Gemini Vision assistant for blind safety**  
-✅ **Repo-level code understanding using Gemini long context (ZIP intelligence)**  
-✅ **UI Screenshot → Working Flutter/React Code generation in seconds**
+✅ Real-time Gemini Vision assistant for blind safety  
+✅ Repo-level code understanding using Gemini long context (ZIP intelligence)  
+✅ UI Screenshot → Working Flutter/React Code generation in seconds  
+
+---
+
+# ⚡ Quick Judge Test (30 Seconds)
+
+Try these instantly:
+
+### 👁️ Netra Vision Mode
+- Open **Live Vision**
+- Point camera forward  
+- Hear real-time narration + hazard alerts  
+
+### 💻 Developer Mode
+- Upload a **ZIP repository**
+- Ask: *“Explain authentication flow”*  
+- Upload a UI screenshot → Get Flutter code instantly  
 
 ---
 
@@ -88,13 +104,11 @@ CodeNetra-AI solves both with Gemini 3 multimodal intelligence:
 
 ---
 
----
-
 # 👁️ Netra Vision Mode — Accessibility Suite (Primary Impact)
 
 Built to empower visually impaired users with **Digital Eyes + Voice Guidance**.
 
-## Features
+## Key Features
 
 ### 🎥 Live Vision (Real-Time World Narration)
 Uses Gemini 3 Vision + Camera Stream to:
@@ -103,7 +117,7 @@ Uses Gemini 3 Vision + Camera Stream to:
 - identify hazards  
 - narrate surroundings instantly  
 
-Example:
+Example:  
 > “A car is ahead. Please move left.”
 
 ---
@@ -135,7 +149,7 @@ Upload any PDF and Gemini will:
 - explain complex text  
 - provide spoken narration  
 
-Example:
+Example:  
 > “Explain this PDF in Hindi.”
 
 ---
@@ -170,13 +184,11 @@ Helps blind users understand social cues:
 
 ---
 
----
-
 # 💻 Developer Mode — AI Coding Productivity Suite
 
-Built for developers using Gemini 3 reasoning + long context.
+Developer Mode is a **secondary showcase** of Gemini’s long-context reasoning for engineers.
 
-## Features
+## Key Features
 
 ### 📂 Repo Chat (ZIP Intelligence)
 Upload an entire `.zip` project repository and ask:
@@ -201,7 +213,7 @@ Convert any UI screenshot into:
 - HTML + Tailwind Layouts  
 - Python GUI  
 
-Example:
+Example:  
 > “Generate Flutter code for this design.”
 
 ---
@@ -213,7 +225,7 @@ Paste any stack trace and Gemini will:
 - explain the issue  
 - suggest exact fix + patch  
 
-Example:
+Example:  
 > “Fix this Flutter build error.”
 
 ---
@@ -233,8 +245,6 @@ AI-powered interview practice:
 - real technical questions  
 - instant feedback  
 - spoken answers  
-
----
 
 ---
 
@@ -280,24 +290,29 @@ Unlike single-purpose AI apps, CodeNetra-AI combines:
 
 ---
 
-# ⚡ Run Locally
+# 🔐 API Key & Security Note
 
-## 1. Clone Repository
+For security reasons, the Gemini API key and Firebase configuration files are **not included** in this public repository.
 
-```bash
+These files are safely excluded using `.gitignore`:
+
+- `lib/ai_logic.dart`
+- `firebase_options.dart`
+
+### To Run Locally:
+
+1. Create your own Gemini API key from Google AI Studio  
+2. Add it inside your local `ai_logic.dart` file:
+
+```dart
+const String apiKey = "YOUR_API_KEY_HERE";
+
+⚡ Run Locally
+1. Clone Repository
 git clone https://github.com/roshancodes036-sudo/CodeNetra-Flutter-AI.git
 cd CodeNetra-Flutter-AI
 
-2. Add Gemini API Key
-
-Open:
-
-lib/ai_logic.dart
-
-Replace:
-const String apiKey = "YOUR_API_KEY_HERE";
-
-3. Install & Run
+2. Install & Run
 flutter pub get
 flutter run
 
@@ -318,6 +333,8 @@ Accessibility Innovation
 Developer Acceleration
 
 Gemini 3 Multimodal Intelligence
+::contentReference[oaicite:0]{index=0}
+
 
 
 
