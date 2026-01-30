@@ -4,9 +4,10 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 
+// ✅ AI Brain Connect
+import '../services/ai_logic.dart'; 
 import '../theme/app_colors.dart';
 import '../widgets/custom_widgets.dart';
-import '../services/ai_logic.dart';
 
 class InterviewScreen extends StatefulWidget {
   const InterviewScreen({super.key});
@@ -15,16 +16,14 @@ class InterviewScreen extends StatefulWidget {
 }
 
 class _InterviewScreenState extends State<InterviewScreen> {
+  // ✅ Brain Connected
+  final AIBrain _brain = AIBrain(); 
+  
   final FlutterTts _tts = FlutterTts();
   late stt.SpeechToText _speech;
-  final AIBrain _brain = AIBrain();
   final ScrollController _scrollController = ScrollController();
 
-<<<<<<< HEAD
   final List<Map<String, String>> _chat = [];
-=======
-  List<Map<String, String>> _chat = [];
->>>>>>> 832c7bd3bcb96f9109cb044a4194ff3dd0a9c4c9
   bool _isListening = false;
   bool _isProcessing = false;
   String _statusText = "Tap Mic to Start";
@@ -34,10 +33,8 @@ class _InterviewScreenState extends State<InterviewScreen> {
   void initState() {
     super.initState();
     _speech = stt.SpeechToText();
-    _brain.initBrain();
     _setupVoice();
-    _addMessage("ai",
-        "Namaste! I am your AI Interviewer. Choose a topic and tap the mic to start.");
+    _addMessage("ai", "Namaste! I am your AI Interviewer. Choose a topic and tap the mic to start.");
   }
 
   Future<void> _setupVoice() async {
@@ -47,7 +44,10 @@ class _InterviewScreenState extends State<InterviewScreen> {
   }
 
   void _startListening() async {
-    bool available = await _speech.initialize();
+    bool available = await _speech.initialize(
+      onError: (val) => print('Error: $val'),
+      onStatus: (val) => print('Status: $val'),
+    );
     if (available) {
       setState(() {
         _isListening = true;
@@ -58,6 +58,8 @@ class _InterviewScreenState extends State<InterviewScreen> {
           _processUserResponse(val.recognizedWords);
         }
       });
+    } else {
+      setState(() => _statusText = "Mic not available");
     }
   }
 
@@ -72,18 +74,28 @@ class _InterviewScreenState extends State<InterviewScreen> {
   void _processUserResponse(String text) async {
     _stopListening();
     if (text.trim().isEmpty) return;
+    
     _addMessage("user", text);
     setState(() => _isProcessing = true);
 
-    String prompt = """
-    ACT AS A STRICT GOOGLE INTERVIEWER. Topic: $_currentTopic. User Said: "$text".
-    INSTRUCTIONS: 1. If user says 'Start', ask first question. 2. Rate answers (0-10) & correct them. 3. Ask NEXT question. 4. Keep it conversational.
-    """;
-    String? res = await _brain.askLaravel(prompt);
-    if (mounted) {
-      setState(() => _isProcessing = false);
-      _addMessage("ai", res ?? "Error");
-      _speak(res ?? "Error");
+    // ✅ FIXED: Simple String format to avoid errors
+    String prompt = "ACT AS AN INTERVIEWER. Topic: $_currentTopic. User said: $text. Keep answer short.";
+    
+    try {
+      // ✅ FIXED: Using 'askLaravel' instead of 'chat'
+      final String? res = await _brain.askLaravel(prompt);
+
+      if (mounted) {
+        setState(() => _isProcessing = false);
+        String finalResponse = res ?? "I didn't catch that. Please try again.";
+        _addMessage("ai", finalResponse);
+        _speak(finalResponse);
+      }
+    } catch (e) {
+        if (mounted) {
+          setState(() => _isProcessing = false);
+          _addMessage("ai", "Connection Error.");
+        }
     }
   }
 
@@ -93,8 +105,13 @@ class _InterviewScreenState extends State<InterviewScreen> {
       _statusText = role == "ai" ? "AI Speaking..." : "Your Turn";
     });
     Timer(const Duration(milliseconds: 100), () {
-      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300), 
+          curve: Curves.easeOut
+        );
+      }
     });
   }
 
@@ -106,6 +123,7 @@ class _InterviewScreenState extends State<InterviewScreen> {
   void dispose() {
     _tts.stop();
     _speech.stop();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -118,7 +136,7 @@ class _InterviewScreenState extends State<InterviewScreen> {
         SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-                children: ["Flutter", "React Native", "Python", "System Design"]
+                children: ["Flutter", "React Native", "Python", "HR Round"]
                     .map((topic) => Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: ActionChip(
@@ -160,14 +178,12 @@ class _InterviewScreenState extends State<InterviewScreen> {
                               decoration: BoxDecoration(
                                   color: isAi
                                       ? AppColors.cardSurface
-                                      : AppColors.primaryAccent
-                                          .withOpacity(0.2),
+                                      : AppColors.primaryAccent.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                       color: isAi
                                           ? Colors.white10
-                                          : AppColors.primaryAccent
-                                              .withOpacity(0.5))),
+                                          : AppColors.primaryAccent.withOpacity(0.5))),
                               child: Text(_chat[index]['msg']!,
                                   style: GoogleFonts.outfit(
                                       color: Colors.white, fontSize: 15))));
@@ -195,7 +211,9 @@ class _InterviewScreenState extends State<InterviewScreen> {
                             spreadRadius: 5)
                     ],
                     border: Border.all(color: AppColors.primaryAccent)),
-                child: Icon(_isListening ? Icons.mic : Icons.mic_none,
+                child: _isProcessing 
+                  ? const CircularProgressIndicator(color: Colors.black)
+                  : Icon(_isListening ? Icons.mic : Icons.mic_none,
                     color: _isListening ? Colors.black : Colors.white,
                     size: 30))),
         const SizedBox(height: 10),

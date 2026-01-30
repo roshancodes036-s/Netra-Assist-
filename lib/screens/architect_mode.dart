@@ -121,7 +121,7 @@ class _ArchitectScreenState extends State<ArchitectScreen> {
                                 backgroundColor: AppColors.backgroundDark,
                                 side: BorderSide(
                                     color: AppColors.primaryAccent
-                                        .withOpacity(0.5)),
+                                        .withAlpha(128)),
                                 labelStyle:
                                     const TextStyle(color: Colors.white),
                                 onPressed: () {
@@ -174,7 +174,7 @@ class _ArchitectScreenState extends State<ArchitectScreen> {
                               padding: const EdgeInsets.all(16),
                               child: SelectableText(_blueprint,
                                   style: GoogleFonts.firaCode(
-                                      color: Colors.white.withOpacity(0.9),
+                                      color: Colors.white.withAlpha(230),
                                       fontSize: 14,
                                       height: 1.6))))
                     ])))

@@ -92,7 +92,6 @@ class _PDFScreenState extends State<PDFScreen> {
         _askAI("Summarize this document in 3 bullet points.");
       }
     } catch (e) {
-      print("🔴 PDF ERROR: $e");
       setState(() {
         _isLoading = false;
         _messages.add({
@@ -235,7 +234,7 @@ class _PDFScreenState extends State<PDFScreen> {
                                   color: isAi
                                       ? AppColors.cardSurface
                                       : AppColors.primaryAccent
-                                          .withOpacity(0.2),
+                                          .withAlpha(51),
                                   borderRadius: BorderRadius.only(
                                       topLeft: const Radius.circular(12),
                                       topRight: const Radius.circular(12),
@@ -249,7 +248,7 @@ class _PDFScreenState extends State<PDFScreen> {
                                       color: isAi
                                           ? Colors.white10
                                           : AppColors.primaryAccent
-                                              .withOpacity(0.5))),
+                                              .withAlpha(128))),
                               child: SelectableText(msg['msg']!,
                                   style: GoogleFonts.outfit(
                                       color: Colors.white,
@@ -277,7 +276,7 @@ class _PDFScreenState extends State<PDFScreen> {
                               color: Colors.white, fontSize: 12),
                           backgroundColor: AppColors.cardSurface,
                           side: BorderSide(
-                              color: AppColors.primaryAccent.withOpacity(0.5)),
+                              color: AppColors.primaryAccent.withAlpha(128)),
                           shape: const StadiumBorder(),
                           onPressed: () => _askAI(_suggestedChips[index]))))),
         Container(

@@ -1,11 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart'; // ✅ Animation Package Added
 
 import '../theme/app_colors.dart';
 import '../widgets/custom_widgets.dart';
 
-// ✅ IMPORT ALL SCREENS (Code Expert Removed)
+// ✅ IMPORT ALL SCREENS
 import 'repo_chat.dart';
 import 'ui_to_code.dart';
 import 'vision_mode.dart';
@@ -48,7 +49,6 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     // ✅ MASTER LIST OF SCREENS
-    // Sequence Updated (Code Expert Removed)
     final List<Widget> screens = [
       HomeScreen(onNavigate: _changeScreen, isDevMode: _isDevMode), // 0
 
@@ -99,8 +99,12 @@ class _MainLayoutState extends State<MainLayout> {
                 _changeScreen(index);
                 Navigator.pop(context);
               })),
+      // ✨ Smooth Fade Transition between screens
       body: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 400),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(opacity: animation, child: child);
+          },
           child: screens[safeIndex]),
     );
   }
@@ -122,12 +126,15 @@ class _MainLayoutState extends State<MainLayout> {
                 fontWeight: FontWeight.w700,
                 color: Colors.white)),
       ]),
-    );
+    )
+        .animate()
+        .fadeIn(duration: 600.ms)
+        .slideY(begin: -1, end: 0); // AppBar Animation
   }
 }
 
 // -----------------------------------------------------------------------------
-// 🔥 SIDEBAR CONTENT (Buttons Updated)
+// 🔥 SIDEBAR CONTENT
 // -----------------------------------------------------------------------------
 class SidebarContent extends StatelessWidget {
   final int selectedIndex;
@@ -154,8 +161,10 @@ class SidebarContent extends StatelessWidget {
             Text("CodeNetra",
                 style: GoogleFonts.outfit(
                     fontSize: 26, fontWeight: FontWeight.w800))
-          ]),
+          ]).animate().fadeIn().scale(), // Logo Pop
+
           const SizedBox(height: 30),
+
           Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(4),
@@ -168,6 +177,7 @@ class SidebarContent extends StatelessWidget {
                 _modeButton("Netra", Icons.visibility_rounded, false)
               ])),
           const SizedBox(height: 30),
+
           Expanded(
               child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -179,7 +189,7 @@ class SidebarContent extends StatelessWidget {
                             : "ACCESSIBILITY SUITE"),
                         _btn("Dashboard", Icons.dashboard_rounded, 0),
 
-                        // 🔥 DEV BUTTONS (Code Expert Removed)
+                        // 🔥 DEV BUTTONS
                         if (isDevMode) ...[
                           _btn("Repo Chat", Icons.folder_zip_rounded, 1),
                           _btn("UI to Code", Icons.image_aspect_ratio_rounded,
@@ -188,7 +198,7 @@ class SidebarContent extends StatelessWidget {
                           _btn("System Architect", Icons.architecture, 4),
                           _btn("Mock Interview", Icons.record_voice_over, 5),
                         ]
-                        // 🔥 NETRA BUTTONS (Indices Updated)
+                        // 🔥 NETRA BUTTONS
                         else ...[
                           _btn("Live Vision", Icons.camera_enhance_rounded, 6),
                           _btn("Voice Assistant", Icons.graphic_eq_rounded, 7),
@@ -198,7 +208,11 @@ class SidebarContent extends StatelessWidget {
                           _btn("Face & Emotion", Icons.face_retouching_natural,
                               10),
                         ],
-                      ]))),
+                      ]
+                          // Staggered List Animation (Menu items slide in one by one)
+                          .animate(interval: 50.ms)
+                          .fadeIn(duration: 400.ms)
+                          .slideX(begin: -0.1, end: 0)))),
           _btn("Upgrade Plan", Icons.bolt_rounded, 11),
           const SizedBox(height: 20),
         ]));
@@ -267,7 +281,7 @@ class SidebarContent extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 🔥 HOME SCREEN (Dashboard Cards Updated)
+// 🔥 HOME SCREEN (With Tagda Animation)
 // -----------------------------------------------------------------------------
 class HomeScreen extends StatelessWidget {
   final Function(int) onNavigate;
@@ -280,6 +294,7 @@ class HomeScreen extends StatelessWidget {
         padding:
             const EdgeInsets.only(top: 100, left: 24, right: 24, bottom: 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // 1️⃣ Header Animation (Slide Down)
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text("Hello, ${isDevMode ? 'Developer' : 'Netra User'}",
@@ -291,40 +306,65 @@ class HomeScreen extends StatelessWidget {
             const CircleAvatar(
                 backgroundColor: AppColors.cardSurface,
                 child: Icon(Icons.person, color: Colors.white))
-          ]),
+          ])
+              .animate()
+              .fadeIn(duration: 600.ms)
+              .slideY(begin: -0.2, end: 0, curve: Curves.easeOut),
+
           const SizedBox(height: 30),
 
-          // BIG CARD
+          // 2️⃣ BIG CARD (Slide Up + Shimmer)
           _largeActionCard(
-              title: isDevMode ? "System Architect" : "Live Vision",
-              subtitle: isDevMode
-                  ? "Design Databases & APIs Instantly"
-                  : "Identify Objects & Read Text",
-              icon: isDevMode ? Icons.architecture : Icons.remove_red_eye,
-              color: AppColors.primaryAccent,
-              onTap: () => onNavigate(isDevMode ? 4 : 6) // Updated Index
-              ),
+                  title: isDevMode ? "System Architect" : "Live Vision",
+                  subtitle: isDevMode
+                      ? "Design Databases & APIs Instantly"
+                      : "Identify Objects & Read Text",
+                  icon: isDevMode ? Icons.architecture : Icons.remove_red_eye,
+                  color: AppColors.primaryAccent,
+                  onTap: () => onNavigate(isDevMode ? 4 : 6))
+              .animate()
+              .fadeIn(duration: 600.ms, delay: 200.ms) // Wait for header
+              .slideY(
+                  begin: 0.2, end: 0, curve: Curves.easeOutBack) // Bouncy up
+              .shimmer(
+                  delay: 1200.ms,
+                  duration: 1500.ms,
+                  color: Colors.white.withOpacity(0.4)), // ✨ SHINE EFFECT
 
           const SizedBox(height: 20),
 
-          // SMALL CARDS GRID
+          // 3️⃣ SMALL CARDS GRID (Staggered Animation)
           Row(children: [
             if (isDevMode) ...[
               Expanded(
                   child: _smallCard("Repo Chat", Icons.folder_zip, Colors.blue,
-                      () => onNavigate(1))),
+                          () => onNavigate(1))
+                      .animate()
+                      .fadeIn(delay: 400.ms)
+                      .slideX(begin: -0.2, end: 0) // Comes from left
+                  ),
               const SizedBox(width: 15),
               Expanded(
                   child: _smallCard("Mock Interview", Icons.record_voice_over,
-                      Colors.orange, () => onNavigate(5)))
+                          Colors.orange, () => onNavigate(5))
+                      .animate()
+                      .fadeIn(delay: 500.ms)
+                      .slideX(begin: 0.2, end: 0) // Comes from right
+                  )
             ] else ...[
               Expanded(
                   child: _smallCard("Visual Q&A", Icons.help_outline,
-                      Colors.pink, () => onNavigate(9))),
+                          Colors.pink, () => onNavigate(9))
+                      .animate()
+                      .fadeIn(delay: 400.ms)
+                      .slideX(begin: -0.2, end: 0)),
               const SizedBox(width: 15),
               Expanded(
                   child: _smallCard("Emotion Scan", Icons.face, Colors.purple,
-                      () => onNavigate(10)))
+                          () => onNavigate(10))
+                      .animate()
+                      .fadeIn(delay: 500.ms)
+                      .slideX(begin: 0.2, end: 0))
             ]
           ])
         ]));

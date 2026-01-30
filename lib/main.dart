@@ -15,13 +15,10 @@ import 'screens/splash_screen.dart'; // First Screen
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Initialize Firebase (Legacy/Backup)
-  try {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-  } catch (e) {
-    debugPrint("⚠️ Firebase Warning: $e");
-  }
+  // 1. Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // 2. System UI Styling (Immersive Pitch Black Mode)
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

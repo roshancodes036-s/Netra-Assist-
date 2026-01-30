@@ -92,7 +92,7 @@ class _ErrorFixerScreenState extends State<ErrorFixerScreen> {
                     color: const Color(0xFF1E1E1E),
                     borderRadius: BorderRadius.circular(12),
                     border:
-                        Border.all(color: Colors.redAccent.withOpacity(0.5))),
+                        Border.all(color: Colors.redAccent.withAlpha(128))),
                 child: Column(children: [
                   Expanded(
                       child: TextField(

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart'; // ✅ Animation Added
 import '../theme/app_colors.dart';
 
-// 1. ProCard
+// 1. ProCard (Animated Wrapper)
 class ProCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -22,11 +23,15 @@ class ProCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: Padding(
                   padding: padding ?? const EdgeInsets.all(16), child: child))),
-    );
+    ).animate().fade(duration: 400.ms).scale(
+        delay: 100.ms,
+        duration: 300.ms,
+        curve: Curves.easeOut); // 👈 Subtle Pop Effect
   }
 }
 
-// 2. ProPageLayout
+// 2. ProPageLayout (THE MASTERSTROKE 🎨)
+// This animates EVERY screen automatically!
 class ProPageLayout extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -41,15 +46,28 @@ class ProPageLayout extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.fromLTRB(20, 100, 20, 20),
         child: Column(children: [
+          // Header Animation
           Row(children: [
-            Icon(icon, color: AppColors.primaryAccent, size: 28),
+            Icon(icon, color: AppColors.primaryAccent, size: 28)
+                .animate()
+                .scale(
+                    duration: 500.ms, curve: Curves.elasticOut), // Icon Bounces
             const SizedBox(width: 12),
             Text(title,
-                style: GoogleFonts.outfit(
-                    fontSize: 28, fontWeight: FontWeight.bold))
+                    style: GoogleFonts.outfit(
+                        fontSize: 28, fontWeight: FontWeight.bold))
+                .animate()
+                .fadeIn(duration: 600.ms)
+                .slideX(begin: -0.2, end: 0) // Title Slides in
           ]),
           const SizedBox(height: 24),
-          Expanded(child: child)
+
+          // Body Animation (Slides Up)
+          Expanded(
+              child: child
+                  .animate()
+                  .fadeIn(delay: 200.ms)
+                  .slideY(begin: 0.1, end: 0))
         ]));
   }
 }
@@ -71,11 +89,13 @@ class NeonInputWrapper extends StatelessWidget {
               color: AppColors.cardSurface,
               borderRadius: BorderRadius.circular(29)),
           child: child),
-    );
+    ).animate().shimmer(
+        duration: 2000.ms,
+        color: Colors.white.withOpacity(0.2)); // ✨ Constant Shine
   }
 }
 
-// 4. Modern Chat Bubble
+// 4. Modern Chat Bubble (WhatsApp Style Animation)
 class ModernChatBubble extends StatelessWidget {
   final bool isUser;
   final String text;
@@ -99,7 +119,14 @@ class ModernChatBubble extends StatelessWidget {
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
         decoration: BoxDecoration(
             color: isUser ? AppColors.primaryAccent : AppColors.cardSurface,
-            borderRadius: BorderRadius.circular(16)),
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(16),
+              topRight: const Radius.circular(16),
+              bottomLeft:
+                  isUser ? const Radius.circular(16) : const Radius.circular(4),
+              bottomRight:
+                  isUser ? const Radius.circular(4) : const Radius.circular(16),
+            )),
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (isUser)
@@ -129,12 +156,15 @@ class ModernChatBubble extends StatelessWidget {
               }
             })
         ]),
-      ),
+      ).animate().fade(duration: 400.ms).slideX(
+          begin: isUser ? 0.2 : -0.2,
+          end: 0,
+          curve: Curves.easeOut), // 👈 Slide in from sides
     );
   }
 }
 
-// 5. Code Highlighter Logic
+// 5. Code Highlighter Logic (Same as before)
 class CodeHighlighter {
   static TextSpan highlight(String code) {
     List<TextSpan> spans = [];
@@ -169,7 +199,7 @@ class CodeHighlighter {
   }
 }
 
-// 6. Status Badge
+// 6. Status Badge (Retaining Manual + Adding entrance)
 class StatusBadge extends StatefulWidget {
   final bool isDevMode;
   const StatusBadge({super.key, required this.isDevMode});
@@ -226,6 +256,8 @@ class _StatusBadgeState extends State<StatusBadge>
                   letterSpacing: 0.5)),
         ),
       ]),
-    );
+    )
+        .animate()
+        .scale(duration: 400.ms, curve: Curves.easeOutBack); // Entrance Pop
   }
 }

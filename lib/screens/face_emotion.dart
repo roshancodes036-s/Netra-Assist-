@@ -72,7 +72,7 @@ class _FaceEmotionScreenState extends State<FaceEmotionScreen> {
                     color: AppColors.cardSurface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: AppColors.primaryAccent.withOpacity(0.5))),
+                        color: AppColors.primaryAccent.withAlpha(128))),
                 child: _image != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(20),
@@ -83,7 +83,7 @@ class _FaceEmotionScreenState extends State<FaceEmotionScreen> {
                             Icon(Icons.person_search,
                                 size: 80,
                                 color:
-                                    AppColors.primaryAccent.withOpacity(0.5)),
+                                    AppColors.primaryAccent.withAlpha(128)),
                             const SizedBox(height: 10),
                             Text("Tap to Scan",
                                 style: GoogleFonts.outfit(
