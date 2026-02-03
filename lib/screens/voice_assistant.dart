@@ -25,52 +25,64 @@ class _VoiceScreenState extends State<VoiceScreen>
   // Variables
   bool _isListening = false;
   bool _isThinking = false;
-  String _text = "Tap Orb to speak";
+  String _status = "INITIALIZING..."; // Top Status Text
   String _aiResponse = "";
 
-  // Animation for Orb (Pulse Effect)
+  // 🔥 SAFETY TIMER
+  Timer? _silenceTimer;
+
+  // Animation
   late AnimationController _animController;
 
   @override
   void initState() {
     super.initState();
     _speech = stt.SpeechToText();
-    _brain.initBrain(); // Brain ko initialize karna zaruri hai
-    _initTTS();
+    _brain.initBrain();
 
-    // Animation Setup
     _animController = AnimationController(
         vsync: this,
-        duration: const Duration(milliseconds: 1500),
+        duration: const Duration(milliseconds: 1000), // Thoda fast pulse
         lowerBound: 0.9,
-        upperBound: 1.05);
+        upperBound: 1.1);
+
+    // Auto Start
+    _initSystem();
   }
 
-  // 1. SETUP ENGLISH VOICE
-  Future<void> _initTTS() async {
-    await _tts.setPitch(1.0);
-    await _tts.setSpeechRate(0.5); // Clear English speaking rate
-    await _tts.setLanguage("en-US"); // Strictly US English
+  // 1. SETUP SYSTEM (Voice & Auto-Loop)
+  void _initSystem() async {
+    // Google/Jarvis Voice Settings
+    await _tts.setLanguage("en-US");
+    await _tts.setPitch(0.9); // Clear & Natural pitch
+    await _tts.setSpeechRate(0.55); // Thoda tezi se bolega (Smart feel)
+
+    // Loop Logic: Jab bolna band kare, turant sunna shuru kare
+    _tts.setCompletionHandler(() {
+      if (mounted && !_isListening && !_isThinking) {
+        _startListening();
+      }
+    });
+
+    // Welcome Message
+    await Future.delayed(const Duration(milliseconds: 500));
+    await _tts.speak("CodeNetra online. I'm listening, Sir.");
   }
 
-  // 2. GOOGLE-LIKE LISTENING (High Sensitivity)
+  // 2. ULTRA-FAST LISTENING (Google Assistant Style)
   void _startListening() async {
+    if (_isListening || _isThinking) return;
+
     bool available = await _speech.initialize(
-      onError: (val) => debugPrint('Error: $val'),
+      onError: (val) => _resetSilenceTimer(),
       onStatus: (val) {
         if (val == 'done' || val == 'notListening') {
-          // Jab sunna band ho jaye
           if (mounted) {
-            setState(() => _isListening = false);
+            setState(() {
+              _isListening = false;
+              _status = "PROCESSING..."; // Status update
+            });
             _animController.stop();
-            _animController.value = 1.0;
-          }
-
-          // Agar kuch bola gaya hai, to process karo
-          if (_text.isNotEmpty &&
-              _text != "Listening..." &&
-              _text != "Tap Orb to speak") {
-            _processVoice(_text);
           }
         }
       },
@@ -79,77 +91,92 @@ class _VoiceScreenState extends State<VoiceScreen>
     if (available) {
       setState(() {
         _isListening = true;
-        _aiResponse = ""; // Purana jawab hata do
-        _text = "Listening...";
+        _status = "LISTENING..."; // Status update
       });
-      _animController.repeat(reverse: true); // Animation shuru
+      _animController.repeat(reverse: true);
+      _resetSilenceTimer();
 
       _speech.listen(
         onResult: (val) {
-          setState(() {
-            _text = val.recognizedWords; // Live text update
-          });
+          _silenceTimer?.cancel();
+          // Hum text update nahi kar rahe screen pe (Clean Look)
+
+          if (val.finalResult) {
+            // Jaise hi user rukega, ye turant fire hoga
+            _processVoice(val.recognizedWords);
+          }
         },
-        // 🔥 Settings for Long & Sensitive Listening
-        listenFor: const Duration(seconds: 30), // 30 sec tak sunega
-        pauseFor: const Duration(seconds: 5), // 5 sec pause allow hai
+        // 🔥 SETTINGS FOR SPEED (Google Assistant Feel)
+        listenFor: const Duration(seconds: 20),
+        pauseFor:
+            const Duration(seconds: 2), // 2 sec rukte hi pakad lega (Fast)
+        localeId: "en-US",
+        listenMode: stt.ListenMode.dictation,
         partialResults: true,
-        localeId: "en-US", // Sirf English sunega
-        cancelOnError: false,
-        listenMode: stt.ListenMode.dictation, // Best mode for sentences
       );
     }
   }
 
   void _stopListening() {
     _speech.stop();
+    _silenceTimer?.cancel();
     if (mounted) {
       setState(() {
         _isListening = false;
         _animController.stop();
-        _animController.value = 1.0;
+        _status = "TAP TO ACTIVATE";
       });
     }
   }
 
-  // 3. AI PROCESSING (Detailed English Response)
-  void _processVoice(String query) async {
-    if (query.trim().isEmpty || query == "Listening...") return;
-
-    _speech.stop(); // Sunna band karo
-    setState(() {
-      _isListening = false;
-      _isThinking = true; // Sochna shuru
-      _animController.stop();
+  void _resetSilenceTimer() {
+    _silenceTimer?.cancel();
+    // 60 sec tak wait karega, fir sleep
+    _silenceTimer = Timer(const Duration(seconds: 60), () {
+      _stopListening();
+      _tts.speak("Going to sleep mode, Sir.");
     });
+  }
 
-    // Handle "Who made you" locally for speed
-    String lowerQuery = query.toLowerCase();
-    if (lowerQuery.contains("who made you") ||
-        lowerQuery.contains("developer") ||
-        lowerQuery.contains("creator")) {
-      _finalizeResponse(
-          "I am CodeNetra AI, engineered by Roshan Chaurasiya from Ghazipur. My mission is to be the digital eyes for the visually impaired.");
+  // 3. INTELLIGENT PROCESSING (Satik Answer Logic)
+  void _processVoice(String query) async {
+    if (query.trim().isEmpty) {
+      _startListening();
       return;
     }
 
-    // 🔥 PROMPT FOR FULL DETAILED EXPLANATION
+    _speech.stop();
+    _silenceTimer?.cancel();
+
+    setState(() {
+      _isListening = false;
+      _isThinking = true;
+      _animController.stop();
+      _status = "ANALYZING...";
+    });
+
+    // Identity check
+    if (query.toLowerCase().contains("who are you")) {
+      _finalizeResponse("I am CodeNetra AI, your intelligent assistant, Sir.");
+      return;
+    }
+
+    // 🔥 THE PERFECT PROMPT (Satik & Smart)
     String prompt = """
-    You are CodeNetra, an advanced AI assistant for the blind.
+    You are CodeNetra-AI. You are talking to your Boss.
     User said: "$query"
     
     INSTRUCTIONS:
-    1. Reply strictly in English Only.
-    2. Provide a DETAILED and INFORMATIVE explanation (No word limit).
-    3. Explain concepts clearly like a teacher.
-    4. If asked about code, explain the logic simply.
+    1. Reply in English. Tone: Smart, Professional, Concise.
+    2. Length: 2 to 3 sentences (Approx 60-80 words).
+    3. QUALITY: Do not be too short. Explain the MAIN point clearly.
+    4. Don't waste time on greetings. Give the Answer directly.
+    5. If asked a technical question, explain it simply but accurately.
     """;
 
-    // ✅ FIX: Yahan 'askTextOnly' ki jagah 'askLaravel' lagaya hai
-    // Kyunki tumhari ai_logic.dart me yahi naam hai.
     String? res = await _brain.askLaravel(prompt);
 
-    _finalizeResponse(res ?? "I could not understand. Please try again.");
+    _finalizeResponse(res ?? "I didn't catch that, Sir.");
   }
 
   void _finalizeResponse(String response) async {
@@ -157,10 +184,9 @@ class _VoiceScreenState extends State<VoiceScreen>
       setState(() {
         _isThinking = false;
         _aiResponse = response;
+        _status = "ONLINE"; // Wapas normal status
       });
     }
-    // Ensure TTS stays in English
-    await _tts.setLanguage("en-US");
     await _tts.speak(response);
   }
 
@@ -168,100 +194,105 @@ class _VoiceScreenState extends State<VoiceScreen>
   void dispose() {
     _speech.stop();
     _tts.stop();
+    _silenceTimer?.cancel();
     _animController.dispose();
     super.dispose();
   }
 
+  // 4. HOLOGRAPHIC UI (Clean & Sci-Fi)
   @override
   Widget build(BuildContext context) {
     return ProPageLayout(
-      title: "Voice Assistant",
-      icon: Icons.mic,
+      title: "CODE NETRA",
+      icon: Icons.graphic_eq,
       child: Container(
         color: Colors.black,
         width: double.infinity,
         height: double.infinity,
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          // 1. LIVE TEXT DISPLAY
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(_text,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.outfit(
-                      color:
-                          _isListening ? AppColors.primaryAccent : Colors.white,
-                      fontSize: 22,
-                      fontWeight:
-                          _isListening ? FontWeight.bold : FontWeight.normal))),
+          // STATUS TEXT (HUD Style)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+                border: Border.all(
+                    color: _isListening ? Colors.red : Colors.cyan, width: 1),
+                borderRadius: BorderRadius.circular(4)),
+            child: Text(
+              _status,
+              style: GoogleFonts.shareTechMono(
+                color: _isListening ? Colors.redAccent : Colors.cyanAccent,
+                fontSize: 16,
+                letterSpacing: 2.0,
+              ),
+            ),
+          ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: 50),
 
-          // 2. ORB (Animation & Click)
+          // THE ORB (Glowing)
           GestureDetector(
               onTap: () {
                 if (_isListening) {
                   _stopListening();
                 } else {
+                  _tts.speak("I'm here, Sir.");
                   _startListening();
                 }
               },
               child: ScaleTransition(
                   scale: _animController,
                   child: Container(
-                      height: 350,
-                      width: 350,
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent // No Neon, Pure Original
-                          ),
+                      height: 300,
+                      width: 300,
+                      decoration:
+                          BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                        BoxShadow(
+                          color: (_isListening ? Colors.red : Colors.cyan)
+                              .withOpacity(0.3),
+                          blurRadius: 60,
+                          spreadRadius: 5,
+                        )
+                      ]),
                       child: ClipOval(
                           child: Stack(alignment: Alignment.center, children: [
-                        // Orb Image (Make sure assets/orb.gif exists)
                         Image.asset("assets/orb.gif",
                             fit: BoxFit.cover, height: 350, width: 350),
 
-                        // Loading Indicator (Jab AI soch raha ho)
+                        // Loading Ring
                         if (_isThinking)
                           const SizedBox(
-                            height: 350,
-                            width: 350,
+                            height: 300,
+                            width: 300,
                             child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2),
+                                color: Colors.cyanAccent, strokeWidth: 1),
                           ),
-
-                        // Icons Overlay
-                        if (!_isListening && !_isThinking)
-                          const Icon(Icons.touch_app,
-                              color: Colors.white54, size: 60),
-
-                        if (_isListening)
-                          const Icon(Icons.mic, color: Colors.white, size: 60)
                       ]))))),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: 50),
 
-          // 3. AI RESPONSE BOX (Scrollable for long answers)
+          // HOLOGRAPHIC ANSWER DISPLAY
           if (_aiResponse.isNotEmpty)
-            Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                    padding: const EdgeInsets.all(20),
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                        color: const Color(0xFF111111),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                            color: AppColors.borderSubtle.withOpacity(0.5))),
-                    child: Text(_aiResponse,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.outfit(
-                            color: Colors.white, fontSize: 18))),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Text(
+                _aiResponse.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: GoogleFonts.shareTechMono(
+                    color: Colors.cyanAccent,
+                    fontSize: 18,
+                    height: 1.4, // Line height for readability
+                    shadows: [
+                      const Shadow(
+                        blurRadius: 8.0,
+                        color: Colors.cyan,
+                        offset: Offset(0, 0),
+                      ),
+                    ]),
               ),
             ),
 
-          // Spacer agar response nahi hai to layout maintain rahe
           if (_aiResponse.isEmpty) const Spacer(),
+          const SizedBox(height: 30),
         ]),
       ),
     );
