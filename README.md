@@ -315,7 +315,7 @@ import 'dart:developer' as developer;
 
 class AIBrain {
   // ✅ User API Key Integration
-  static const String _apiKey = "";
+  static const String _apiKey = "YOUR API KEY HERE";
 
   late GenerativeModel _model;
   late ChatSession _chat;
