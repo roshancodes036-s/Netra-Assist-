@@ -1,6 +1,5 @@
 # 👁️ CodeNetra-AI — Gemini 3 Inclusive Vision + Developer Intelligence Suite  
-> **Gemini 3 Hackathon Submission**  
-> *One Platform. Two Modes. Accessibility + Developer Productivity powered by Gemini 3.*
+> **Gemini 3 Hackathon Submission** > *One Platform. Two Modes. Accessibility + Developer Productivity powered by Gemini 3.*
 
 ![Gemini](https://img.shields.io/badge/Powered%20by-Gemini%203.0-8E75B2?style=for-the-badge&logo=google&logoColor=white)
 ![Flutter](https://img.shields.io/badge/Built%20with-Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
@@ -44,16 +43,17 @@ Try these instantly:
 
 ### 💻 Developer Mode
 - Upload a **ZIP repository**
-- Ask: *“Explain authentication flow”*  
-- Upload a UI screenshot → Get Flutter code instantly  
+- Ask: *“Explain authentication flow”* - Upload a UI screenshot → Get Flutter code instantly  
 
 ---
 
 # 🎥 Demo Video
 
-Watch CodeNetra-AI in action:
+Watch CodeNetra-AI in action (Click below):
 
-[![CodeNetra Demo] https://youtu.be/MgDoVY6FzvY?si=n8SKYKc8fbE_bf-q
+[![CodeNetra Demo](https://img.youtube.com/vi/MgDoVY6FzvY/maxresdefault.jpg)](https://www.youtube.com/watch?v=MgDoVY6FzvY)
+
+> *Click the image above to watch the full demo breakdown.*
 
 ---
 
@@ -291,12 +291,14 @@ Unlike single-purpose AI apps, CodeNetra-AI combines:
 ---
 ### 🏆 Hackathon Note
 
-CodeNetra-AI is not just a demo — it is a working inclusive AI product demonstrating:
+CodeNetra-AI is not just an demo — it is a working inclusive AI product demonstrating:
 
 * **Accessibility Innovation:** Real-time help for the visually impaired.
 * **Developer Acceleration:** Tools to boost coding speed.
 * **Gemini 3 Multimodal Intelligence:** Powered by the latest AI models.
 * **✅ Solo Developer Verification:** Please note that commits from users **`roshancodes036-sudo`**, **`sinurai535-a11y`**, and **`Et947`** all belong to the **Sole Creator, Roshan Chaurasiya** (working across different devices).
+
+---
 
 # 🔐 API Key & Security Setup (Important)
 
@@ -388,23 +390,15 @@ class AIBrain {
 }
 
 ⚡ Run Locally
-1. Clone Repository
-git clone https://github.com/roshancodes036-sudo/CodeNetra-Flutter-AI.git
+1.Clone Repository
+git clone [https://github.com/roshancodes036-sudo/CodeNetra-Flutter-AI.git](https://github.com/roshancodes036-sudo/CodeNetra-Flutter-AI.git)
 cd CodeNetra-Flutter-AI
 
-2. Install & Run
+2.Install & Run
 flutter pub get
 flutter run
 
 👨‍💻 Author
-
-Roshan Chaurasiya
-📍 Varanasi, India
+Roshan Chaurasiya 📍 Varanasi, India
 
 Built with ❤️ to demonstrate the real-world impact of Gemini 3.
-
-
-
-
-
-
