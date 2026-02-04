@@ -53,7 +53,7 @@ Try these instantly:
 
 Watch CodeNetra-AI in action:
 
-[![CodeNetra Demo](https://markdown-videos-api.jorgenkh.no/youtube/GucQ1pn_SCk)](https://youtu.be/MgDoVY6FzvY?si=n8SKYKc8fbE_bf-q)
+[![CodeNetra Demo] https://youtu.be/MgDoVY6FzvY?si=n8SKYKc8fbE_bf-q
 
 ---
 
