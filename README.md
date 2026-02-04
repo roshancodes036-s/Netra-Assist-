@@ -388,7 +388,10 @@ Accessibility Innovation
 Developer Acceleration
 
 Gemini 3 Multimodal Intelligence
-::contentReference[oaicite:0]{index=0}
+
+---
+### 📝 Note on Commit History
+Please note that commits from users **`roshancodes036-sudo`**, **`sinurai535-a11y`**, and **`Et947`** all belong to the **sole developer (Roshan Chaurasiya)**. These reflect development across different machines and git configurations during the hackathon.
 
 
 
