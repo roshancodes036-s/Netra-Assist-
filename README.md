@@ -57,17 +57,22 @@ Watch CodeNetra-AI in action (Click below):
 
 ---
 
-# 🎬 App Screenshots (Proof of Working Product)
+# 📸 App Screenshots (Proof of Working Product)
 
 | 👁️ Netra Vision Mode | 💻 Developer Mode Dashboard |
 |:---:|:---:|
-| <img src="netra_home.png" height="430"> | <img src="dev_home.png" height="430"> |
-| Accessibility Suite | Coding Intelligence Hub |
+| <img src="netra_home.png" width="300"> | <img src="dev_home.png" width="300"> |
+| *Accessibility Suite for Blind* | *Coding Intelligence Hub* |
 
 | 🎨 UI → Code Engine | 🐞 AI Debug Assistant |
 |:---:|:---:|
-| <img src="ui_to_code.png" height="430"> | <img src="debugger.png" height="430"> |
-| Screenshot → Code | Fix Errors Instantly |
+| <img src="ui_to_code.png" width="300"> | <img src="debugger.png" width="300"> |
+| *Screenshot → Code Instantly* | *Fix Errors & Root Cause Analysis* |
+
+| 💬 Repo Chat (ZIP Intelligence) |
+|:---:|
+| <img src="repo_chat.png" width="300"> |
+| *Talk to your entire codebase* |
 
 ---
 
@@ -77,7 +82,6 @@ Technology is leaving behind two massive groups:
 
 ## 👁️ Accessibility Gap
 Millions of visually impaired people struggle with:
-
 - navigating safely  
 - reading documents  
 - understanding surroundings  
@@ -85,7 +89,6 @@ Millions of visually impaired people struggle with:
 
 ## 💻 Developer Productivity Gap
 Developers waste hours on:
-
 - repetitive debugging  
 - understanding large repositories  
 - converting UI designs into code  
@@ -96,7 +99,6 @@ Developers waste hours on:
 # 💡 The Solution: One Suite, Two Modes
 
 CodeNetra-AI solves both with Gemini 3 multimodal intelligence:
-
 - Vision Understanding  
 - Voice-First Interface  
 - Long Context Code Reasoning  
@@ -112,7 +114,6 @@ Built to empower visually impaired users with **Digital Eyes + Voice Guidance**.
 
 ### 🎥 Live Vision (Real-Time World Narration)
 Uses Gemini 3 Vision + Camera Stream to:
-
 - detect objects  
 - identify hazards  
 - narrate surroundings instantly  
@@ -124,14 +125,12 @@ Example:
 
 ### 🚗 Live Hazard Detection (Safety Autopilot)
 Detects dangers like:
-
 - vehicles  
 - obstacles  
 - pits  
 - unsafe paths  
 
 Triggers:
-
 - Red Alert UI  
 - Voice warning: **“सावधान!”**
 
@@ -144,7 +143,6 @@ Identifies Indian Rupee notes instantly for blind accessibility.
 
 ### 📄 PDF Intelligence
 Upload any PDF and Gemini will:
-
 - summarize  
 - explain complex text  
 - provide spoken narration  
@@ -156,7 +154,6 @@ Example:
 
 ### ❓ Visual Question Answering (VQA)
 Capture or upload an image and ask:
-
 - “What is written here?”  
 - “What object is this?”  
 - “Is this safe?”  
@@ -167,7 +164,6 @@ Gemini responds with vision reasoning.
 
 ### 🎙️ Voice Assistant (Hands-Free Control)
 Voice-first interaction for accessibility:
-
 - ask without typing  
 - spoken answers  
 - full navigation support  
@@ -176,7 +172,6 @@ Voice-first interaction for accessibility:
 
 ### 🙂 Face & Emotion Awareness
 Helps blind users understand social cues:
-
 - happy  
 - sad  
 - angry  
@@ -192,13 +187,11 @@ Developer Mode is a **secondary showcase** of Gemini’s long-context reasoning 
 
 ### 📂 Repo Chat (ZIP Intelligence)
 Upload an entire `.zip` project repository and ask:
-
 - “Where is login implemented?”  
 - “Explain authentication flow”  
 - “Summarize this codebase”  
 
 Gemini reads:
-
 - folder structure  
 - pubspec.yaml  
 - multiple files together  
@@ -207,7 +200,6 @@ Gemini reads:
 
 ### 🎨 UI → Code Generator
 Convert any UI screenshot into:
-
 - Flutter Widgets  
 - React Native Components  
 - HTML + Tailwind Layouts  
@@ -220,7 +212,6 @@ Example:
 
 ### 🐞 Error Debugger Pro
 Paste any stack trace and Gemini will:
-
 - find root cause  
 - explain the issue  
 - suggest exact fix + patch  
@@ -232,7 +223,6 @@ Example:
 
 ### 🏗️ System Architect Assistant
 Helps developers design scalable apps:
-
 - architecture guidance  
 - clean folder structure  
 - best practices  
@@ -241,7 +231,6 @@ Helps developers design scalable apps:
 
 ### 🎤 Mock Interview Simulator
 AI-powered interview practice:
-
 - real technical questions  
 - instant feedback  
 - spoken answers  
@@ -258,7 +247,6 @@ CodeNetra-AI is built specifically to showcase Gemini 3 strengths:
 ✅ Voice-First Accessibility AI  
 
 Gemini enables both:
-
 - real-world blind assistance  
 - deep repository-level code intelligence  
 
@@ -267,7 +255,6 @@ Gemini enables both:
 # ⭐ What Makes CodeNetra-AI Unique?
 
 Unlike single-purpose AI apps, CodeNetra-AI combines:
-
 - Accessibility + Engineering Productivity  
 - Vision + Voice + Reasoning  
 - Social Good + Developer Acceleration  
@@ -291,7 +278,7 @@ Unlike single-purpose AI apps, CodeNetra-AI combines:
 ---
 ### 🏆 Hackathon Note
 
-CodeNetra-AI is not just an demo — it is a working inclusive AI product demonstrating:
+CodeNetra-AI is not just a demo — it is a working inclusive AI product demonstrating:
 
 * **Accessibility Innovation:** Real-time help for the visually impaired.
 * **Developer Acceleration:** Tools to boost coding speed.
@@ -402,3 +389,4 @@ flutter run
 Roshan Chaurasiya 📍 Varanasi, India
 
 Built with ❤️ to demonstrate the real-world impact of Gemini 3.
+
