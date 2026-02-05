@@ -69,11 +69,6 @@ Watch CodeNetra-AI in action (Click below):
 | <img src="ui_to_code.png" width="300"> | <img src="debugger.png" width="300"> |
 | *Screenshot → Code Instantly* | *Fix Errors & Root Cause Analysis* |
 
-| 💬 Repo Chat (ZIP Intelligence) |
-|:---:|
-| <img src="repo_chat.png" width="300"> |
-| *Talk to your entire codebase* |
-
 ---
 
 # 🌍 The Problem
@@ -386,7 +381,7 @@ flutter pub get
 flutter run
 
 👨‍💻 Author
-Roshan Chaurasiya 📍 Varanasi, India
+Roshan Chaurasiya 📍 Ghazipur, India
 
 Built with ❤️ to demonstrate the real-world impact of Gemini 3.
 
