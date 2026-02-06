@@ -383,5 +383,5 @@ flutter run
 👨‍💻 Author
 Roshan Chaurasiya 📍 Ghazipur, India
 
-Built with ❤️ to demonstrate the real-world impact of Gemini 3.
+Built with ❤️ to demonstrate the real-world impact of Gemini 3
 
