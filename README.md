@@ -41,7 +41,7 @@ Try these instantly to experience the impact:
 
 Watch Netra Assist in action (Click below):
 
-[![Netra Assist Demo](https://img.youtube.com/vi/MgDoVY6FzvY/maxresdefault.jpg)](https://www.youtube.com/watch?v=MgDoVY6FzvY)
+[![Netra Assist Demo](https://img.youtube.com/vi/vOPWrFlzU5U/maxresdefault.jpg)](https://youtu.be/vOPWrFlzU5U?si=RmHYsLr8ZkgIvyt_)
 
 > *Click the image above to watch the full demo breakdown.*
 
@@ -259,6 +259,7 @@ cd Netra-Assist-AI
 2. Install & Run
 flutter pub get
 flutter run
-👨‍💻 Author Roshan Chaurasiya 📍 Ghazipur, India
-Built with ❤️ to demonstrate the real-world impact of AI for Social Good.
 
+👨‍💻 Author Roshan Chaurasiya 📍 Ghazipur, India
+
+Built with ❤️ to demonstrate the real-world impact of AI for Social Good.
