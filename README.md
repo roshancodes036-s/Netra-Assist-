@@ -47,20 +47,6 @@ Watch Netra Assist in action (Click below):
 
 ---
 
-# 📸 App Screenshots (Proof of Working Product)
-
-| 👁️ Netra Assist Dashboard | 🎥 Live Vision AI |
-|:---:|:---:|
-| <img src="netra_home.png" width="300"> | <img src="live_vision.png" width="300"> |
-| *Accessibility Suite for the Blind* | *Real-Time Object & Text Recognition* |
-
-| 📄 PDF Intelligence | 🙂 Emotion & Face Scan |
-|:---:|:---:|
-| <img src="pdf_mind.png" width="300"> | <img src="emotion_scan.png" width="300"> |
-| *Reads & Explains Documents aloud* | *Understand Social Cues via AI* |
-
----
-
 # 🌍 The Problem (Why SDG 3?)
 
 Technology is advancing, but it is leaving behind a massive vulnerable group:
@@ -172,7 +158,6 @@ For security reasons, the API key logic is **not included** in this public repos
 1. **Get API Key:** Get your free key from [Google AI Studio](https://aistudio.google.com/).
 2. **Create File:** Go to `lib/services/` folder and create a new file named **`ai_logic.dart`**.
 3. **Paste Code:** Copy and paste the following code into that file (Replace `YOUR_KEY` with your actual key):
-
 ```dart
 import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
