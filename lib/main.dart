@@ -1,5 +1,5 @@
 // =============================================================================
-// 🔥 CODENETRA AI - MAIN ENTRY POINT (Clean Architecture)
+// 🔥 CODENETRA AI - MAIN ENTRY POINT
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -7,25 +7,26 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// ✅ IMPORTS (Connecting your new folders)
-import 'firebase_options.dart';
-import 'theme/app_colors.dart'; // Design Colors
-import 'screens/splash_screen.dart'; // First Screen
+// ✅ IMPORTS
+import 'theme/app_colors.dart'; 
+import 'screens/splash_screen.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // 1. Safe Firebase Initialization (वेब प्रीव्यू के लिए सेफ तरीका)
+  // इससे अगर Firebase कंफिगर नहीं होगा, तो भी ऐप क्रैश नहीं होगी और UI रन हो जाएगा।
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    print("Firebase Web Error Bypassed for UI Preview: $e");
+  }
 
   // 2. System UI Styling (Immersive Pitch Black Mode)
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light, // White Icons
-    systemNavigationBarColor:
-        Color(0xFF050505), // Matches AppColors.backgroundDark
+    statusBarIconBrightness: Brightness.light, 
+    systemNavigationBarColor: Color(0xFF050505), 
     systemNavigationBarIconBrightness: Brightness.light,
   ));
 
@@ -40,21 +41,19 @@ class CodeNetraApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'CodeNetra AI',
-      debugShowCheckedModeBanner: false, // Hides the 'Debug' banner
+      debugShowCheckedModeBanner: false, 
 
-      // ✅ GLOBAL THEME SETUP (One place to control design)
+      // ✅ GLOBAL THEME SETUP
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor:
-            AppColors.backgroundDark, // From your theme file
-        primaryColor: AppColors.primaryAccent, // From your theme file
+        scaffoldBackgroundColor: AppColors.backgroundDark, 
+        primaryColor: AppColors.primaryAccent, 
         canvasColor: AppColors.backgroundDark,
         useMaterial3: true,
 
-        // Font Setup (Applies Google Fonts globally)
+        // Font Setup
         fontFamily: GoogleFonts.outfit().fontFamily,
-        textTheme:
-            GoogleFonts.outfitTextTheme(Theme.of(context).textTheme).apply(
+        textTheme: GoogleFonts.outfitTextTheme(Theme.of(context).textTheme).apply(
           bodyColor: AppColors.textPrimary,
           displayColor: AppColors.textPrimary,
         ),

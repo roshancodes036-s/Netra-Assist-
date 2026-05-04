@@ -91,7 +91,8 @@ class NeonInputWrapper extends StatelessWidget {
           child: child),
     ).animate().shimmer(
         duration: 2000.ms,
-        color: Colors.white.withOpacity(0.2)); // ✨ Constant Shine
+        // ✅ FIXED: .withOpacity() changed to .withValues(alpha: ...)
+        color: Colors.white.withValues(alpha: 0.2)); // ✨ Constant Shine
   }
 }
 
@@ -180,13 +181,18 @@ class CodeHighlighter {
       }
       String token = match.group(0)!;
       Color color = AppColors.vsNormal;
+      
+      // ✅ FIXED: Missing curly braces {} added to all if/else statements
       if (match.group(1) != null) {
         color = AppColors.vsComment;
-      } else if (match.group(2) != null)
+      } else if (match.group(2) != null) {
         color = AppColors.vsString;
-      else if (match.group(3) != null)
+      } else if (match.group(3) != null) {
         color = AppColors.vsKeyword;
-      else if (match.group(5) != null) color = AppColors.vsType;
+      } else if (match.group(5) != null) {
+        color = AppColors.vsType;
+      }
+
       spans.add(TextSpan(text: token, style: TextStyle(color: color)));
       lastMatchEnd = match.end;
     }
@@ -231,9 +237,10 @@ class _StatusBadgeState extends State<StatusBadge>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-          color: AppColors.primaryAccent.withOpacity(0.08),
+          // ✅ FIXED: .withOpacity() changed to .withValues(alpha: ...)
+          color: AppColors.primaryAccent.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primaryAccent.withOpacity(0.3))),
+          border: Border.all(color: AppColors.primaryAccent.withValues(alpha: 0.3))),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         FadeTransition(
             opacity: _opacity,

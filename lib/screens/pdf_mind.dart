@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:file_picker/file_picker.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:flutter/services.dart';
+import 'package:camera/camera.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter/foundation.dart'; 
 
 import '../theme/app_colors.dart';
 import '../widgets/custom_widgets.dart';
@@ -11,297 +14,267 @@ import '../services/ai_logic.dart';
 
 class PDFScreen extends StatefulWidget {
   const PDFScreen({super.key});
+
   @override
   State<PDFScreen> createState() => _PDFScreenState();
 }
 
-class _PDFScreenState extends State<PDFScreen> {
-  final TextEditingController _ctrl = TextEditingController();
-  final ScrollController _scroll = ScrollController();
+class _PDFScreenState extends State<PDFScreen> with SingleTickerProviderStateMixin {
+  CameraController? _cameraController;
+  final FlutterTts _tts = FlutterTts();
   final AIBrain _brain = AIBrain();
 
-  String _pdfText = "";
-  String _fileName = "";
-  bool _isLoading = false;
-  List<String> _suggestedChips = [];
-  final List<Map<String, String>> _messages = [
-    {
-      "role": "ai",
-      "msg":
-          "Select a PDF document. I will analyze it and give you quick suggestions."
-    }
-  ];
+  bool _isProcessing = false;
+  String _aiResultText = "";
+  bool _isHindi = AIBrain.isHindi; 
+  Timer? _timer; 
+
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
     _brain.initBrain();
+    _initAnimation();
+    _initTTSAndCamera();
   }
 
-  Future<void> _pickPDF() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-          type: FileType.custom, allowedExtensions: ['pdf'], withData: true);
-      if (result != null) {
-        setState(() {
-          _isLoading = true;
-          _fileName = result.files.single.name;
-          _messages.add({"role": "user", "msg": "📂 Uploaded: $_fileName"});
-          _suggestedChips = [];
-        });
-        List<int> bytes;
-        if (kIsWeb) {
-          if (result.files.single.bytes != null) {
-            bytes = result.files.single.bytes!;
-          } else {
-            throw Exception("Web File bytes are null");
-          }
-        } else {
-          if (result.files.single.path != null) {
-            File file = File(result.files.single.path!);
-            bytes = file.readAsBytesSync();
-          } else {
-            throw Exception("Mobile File path is null");
-          }
-        }
-        final PdfDocument document = PdfDocument(inputBytes: bytes);
-        String text = PdfTextExtractor(document).extractText();
-        document.dispose();
-        if (text.trim().isEmpty) {
-          setState(() {
-            _isLoading = false;
-            _messages.add({
-              "role": "ai",
-              "msg":
-                  "⚠️ This PDF seems to be an image (Scanned). Please upload a text-based PDF."
-            });
-          });
-          return;
-        }
-        setState(() {
-          _pdfText = text;
-          _isLoading = false;
-          _suggestedChips = [
-            "📝 Summarize this",
-            "🔑 List Key Points",
-            "❓ What is the conclusion?",
-            "📅 Find all dates",
-            "📧 Extract Emails"
-          ];
-        });
-        _askAI("Summarize this document in 3 bullet points.");
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _messages.add({
-          "role": "ai",
-          "msg": "Error reading PDF. Please ensure it's a valid file."
-        });
-      });
-    }
+  void _initAnimation() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
   }
 
-  void _askAI(String query) async {
-    if (query.trim().isEmpty) return;
+  Future<void> _setupVoice() async {
+    await _tts.setLanguage(_isHindi ? "hi-IN" : "en-US");
+    await _tts.setPitch(1.0);
+    await _tts.setSpeechRate(0.5);
+  }
+
+  void _toggleLanguage() async {
+    await _tts.stop();
     setState(() {
-      _messages.add({"role": "user", "msg": query});
-      _isLoading = true;
-      _ctrl.clear();
+      _isHindi = !_isHindi;
+      AIBrain.isHindi = _isHindi; 
+      _aiResultText = ""; 
     });
-    _scrollToBottom();
-    String lowerQuery = query.toLowerCase();
-    bool isHindi = lowerQuery.contains("kisne") ||
-        lowerQuery.contains("kya") ||
-        lowerQuery.contains("banaya") ||
-        lowerQuery.contains("kaise") ||
-        lowerQuery.contains("sakte") ||
-        lowerQuery.contains("tum") ||
-        lowerQuery.contains("namaste");
+    
+    await _setupVoice();
+    HapticFeedback.lightImpact();
+    
+    String speech = _isHindi ? "हिंदी भाषा सक्रिय।" : "English language active.";
+    await _tts.speak(speech);
+    _startFastAutoPilot(); 
+  }
 
-    if (lowerQuery.contains("who made you") ||
-        lowerQuery.contains("kisne banaya")) {
-      await Future.delayed(const Duration(seconds: 1));
-      String reply = isHindi
-          ? """मैं **CodeNetra AI** हूँ, एक एडवांस इंटेलिजेंस सिस्टम जिसे **रोशन चौरसिया** ने बनाया है।"""
-          : """I am **CodeNetra AI**, an advanced intelligence system engineered by **Roshan Chaurasiya**.""";
-      setState(() {
-        _isLoading = false;
-        _messages.add({"role": "ai", "msg": reply});
-      });
-      _scrollToBottom();
-      return;
-    }
-    if (lowerQuery.contains("what can you do") ||
-        lowerQuery.contains("kya kar sakte ho")) {
-      await Future.delayed(const Duration(seconds: 1));
-      String reply = isHindi
-          ? """मैं **CodeNetra AI** हूँ। मेरी मुख्य शक्तियां ये हैं:\n1. **📄 DocuMind (PDF मास्टर)**\n2. **👁️ नेत्रा विजन**\n3. **🗣️ वॉइस असिस्टेंट**\n4. **💻 कोड एक्सपर्ट**"""
-          : """I am **CodeNetra AI**. Here is my capability suite:\n1. **📄 DocuMind**\n2. **👁️ Netra Vision**\n3. **🗣️ Voice Commander**\n4. **💻 Code Expert**""";
-      setState(() {
-        _isLoading = false;
-        _messages.add({"role": "ai", "msg": reply});
-      });
-      _scrollToBottom();
-      return;
-    }
-    if (_pdfText.isEmpty) {
-      setState(() {
-        _isLoading = false;
-        _messages.add({
-          "role": "ai",
-          "msg": isHindi
-              ? "कृपया पहले कोई PDF अपलोड करें! 📂"
-              : "Please upload a PDF first! 📂"
-        });
-      });
-      return;
-    }
-    String prompt =
-        "CONTEXT FROM PDF: $_pdfText \n USER QUESTION: \"$query\" \n INSTRUCTIONS: 1. Answer ONLY based on the PDF context. 2. Detect user language ($query). If Hindi, answer in Hindi.";
-    String? res = await _brain.askLaravel(prompt);
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        _messages.add({"role": "ai", "msg": res ?? "Connection Error."});
-      });
-      _scrollToBottom();
+  Future<void> _initTTSAndCamera() async {
+    await _setupVoice();
+    
+    String initialGreeting = _isHindi 
+        ? "लाइव पीडीएफ एनालिसिस एक्टिव सर।"
+        : "Live PDF analysis active sir.";
+    await _tts.speak(initialGreeting);
+
+    if (kIsWeb) return;
+
+    final cameras = await availableCameras();
+    if (cameras.isNotEmpty) {
+      _cameraController = CameraController(
+        cameras.first,
+        ResolutionPreset.medium, 
+        enableAudio: false,
+      );
+      await _cameraController!.initialize();
+      if (!mounted) return;
+      setState(() {});
+      _startFastAutoPilot(); 
     }
   }
 
-  void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scroll.hasClients) _scroll.jumpTo(_scroll.position.maxScrollExtent);
+  void _startFastAutoPilot() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(milliseconds: 1500), (timer) {
+      if (!_isProcessing && mounted && _cameraController!.value.isInitialized && _aiResultText.isEmpty) {
+        _scanDocumentInstantly();
+      }
     });
+  }
+
+  Future<void> _scanDocumentInstantly() async {
+    setState(() => _isProcessing = true);
+
+    try {
+      final XFile file = await _cameraController!.takePicture();
+      String? result = await _brain.analyzeDocumentLive(File(file.path));
+
+      // AI check karega ki document hai ya nahi
+      if (result != null && result.trim() == "NO_DOC") {
+        if (mounted) setState(() => _isProcessing = false);
+        return; 
+      }
+
+      // Document mil gaya!
+      _timer?.cancel(); 
+      HapticFeedback.heavyImpact(); 
+
+      setState(() {
+        _aiResultText = result ?? (_isHindi ? "माफ़ करें, समझ नहीं पाया।" : "Sorry, couldn't understand.");
+        _isProcessing = false;
+      });
+
+      await _tts.speak(_aiResultText);
+    } catch (e) {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  // ✅ DOUBLE TAP LOGIC (Reset & Speak)
+  void _resetScanner() async {
+    if (kIsWeb) return; 
+    await _tts.stop();
+    HapticFeedback.mediumImpact();
+
+    setState(() {
+      _aiResultText = ""; // Text khali hote hi panel niche slide ho jayega
+      _isProcessing = false;
+    });
+    
+    // Exactly wahi awaz jo tumne boli thi
+    String restartMsg = _isHindi ? "लाइव पीडीएफ एनालिसिस एक्टिव सर।" : "Live PDF analysis active sir.";
+    await _tts.speak(restartMsg);
+    
+    _startFastAutoPilot(); // Wapas scan shuru
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _cameraController?.dispose();
+    _tts.stop();
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ProPageLayout(
-      title: "DocuMind PDF",
-      icon: Icons.picture_as_pdf_rounded,
-      child: Column(children: [
-        Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-                color: AppColors.cardSurface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderSubtle)),
-            child: Row(children: [
-              Icon(Icons.description,
-                  color: _fileName.isEmpty ? Colors.grey : Colors.redAccent),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: Text(_fileName.isEmpty ? "No PDF Selected" : _fileName,
-                      style: TextStyle(
-                          color: _fileName.isEmpty ? Colors.grey : Colors.white,
-                          fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis)),
-              ElevatedButton.icon(
-                  onPressed: _pickPDF,
-                  icon: const Icon(Icons.upload_file,
-                      size: 18, color: Colors.black),
-                  label: const Text("Upload",
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryAccent))
-            ])),
-        const SizedBox(height: 10),
-        Expanded(
-            child: Container(
+    // Screen height nikal rahe hain animation ke liye
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return GestureDetector(
+      onDoubleTap: _resetScanner, // ✅ Double tap par reset
+      child: ProPageLayout(
+        title: "Live DocuMind",
+        icon: Icons.document_scanner,
+        child: Stack(
+          children: [
+            // 1. Camera Preview
+            if (_cameraController != null && _cameraController!.value.isInitialized)
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: CameraPreview(_cameraController!),
+                ),
+              )
+            else
+              const Center(child: CircularProgressIndicator(color: AppColors.primaryAccent)),
+
+            // 2. Green Scanner Line
+            if (_aiResultText.isEmpty && !kIsWeb)
+              AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  return Positioned(
+                    top: _animationController.value * screenHeight * 0.6,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 3,
+                      decoration: BoxDecoration(
+                        boxShadow: [BoxShadow(color: Colors.greenAccent.withOpacity(0.5), blurRadius: 10, spreadRadius: 5)],
+                        color: Colors.greenAccent,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+            // 3. Status Text (Top)
+            Positioned(
+              top: 15, left: 20, right: 80, 
+              child: Container(
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                    color: const Color(0xFF0D0D0D),
-                    borderRadius: BorderRadius.circular(16)),
-                child: ListView.builder(
-                    controller: _scroll,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final msg = _messages[index];
-                      bool isAi = msg['role'] == 'ai';
-                      return Align(
-                          alignment: isAi
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
-                          child: Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(12),
-                              constraints: BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.75),
-                              decoration: BoxDecoration(
-                                  color: isAi
-                                      ? AppColors.cardSurface
-                                      : AppColors.primaryAccent
-                                          .withAlpha(51),
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: const Radius.circular(12),
-                                      topRight: const Radius.circular(12),
-                                      bottomLeft: isAi
-                                          ? Radius.zero
-                                          : const Radius.circular(12),
-                                      bottomRight: isAi
-                                          ? const Radius.circular(12)
-                                          : Radius.zero),
-                                  border: Border.all(
-                                      color: isAi
-                                          ? Colors.white10
-                                          : AppColors.primaryAccent
-                                              .withAlpha(128))),
-                              child: SelectableText(msg['msg']!,
-                                  style: GoogleFonts.outfit(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      height: 1.5))));
-                    }))),
-        if (_isLoading)
-          const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: LinearProgressIndicator(
-                  color: AppColors.primaryAccent, minHeight: 2)),
-        if (_suggestedChips.isNotEmpty && !_isLoading)
-          Container(
-              height: 50,
-              margin: const EdgeInsets.symmetric(vertical: 5),
-              child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  itemCount: _suggestedChips.length,
-                  itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: ActionChip(
-                          label: Text(_suggestedChips[index]),
-                          labelStyle: const TextStyle(
-                              color: Colors.white, fontSize: 12),
-                          backgroundColor: AppColors.cardSurface,
-                          side: BorderSide(
-                              color: AppColors.primaryAccent.withAlpha(128)),
-                          shape: const StadiumBorder(),
-                          onPressed: () => _askAI(_suggestedChips[index]))))),
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            margin: const EdgeInsets.only(top: 5),
-            decoration: BoxDecoration(
-                color: AppColors.cardSurface,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: AppColors.borderSubtle)),
-            child: Row(children: [
-              Expanded(
-                  child: TextField(
-                      controller: _ctrl,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                          hintText: "Ask something about this PDF...",
-                          hintStyle: TextStyle(color: Colors.white24),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16)),
-                      onSubmitted: (val) => _askAI(val))),
-              IconButton(
-                  icon: const Icon(Icons.send, color: AppColors.primaryAccent),
-                  onPressed: () => _askAI(_ctrl.text))
-            ]))
-      ]),
+                  color: Colors.black87, borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: _aiResultText.isNotEmpty ? Colors.green : Colors.cyanAccent),
+                ),
+                child: Text(
+                  _aiResultText.isNotEmpty 
+                      ? (_isHindi ? "✅ स्कैन पूरा हुआ (डबल-टैप)" : "✅ Scan Complete (Double-Tap)")
+                      : (_isHindi ? "🔍 कागज़ ढूंढ रहा है..." : "🔍 Looking for document..."),
+                  style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+
+            // 4. Language Button (Top Right)
+            Positioned(
+              top: 15, right: 15,
+              child: GestureDetector(
+                onTap: _toggleLanguage,
+                child: CircleAvatar(
+                  backgroundColor: _isHindi ? Colors.greenAccent.withOpacity(0.8) : Colors.black87,
+                  radius: 22,
+                  child: Text(_isHindi ? "हिं" : "EN", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ),
+            ),
+
+            // 5. ✅ THE SLIDE-UP PANEL (Niche se upar aayega)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 600), // 0.6 second ka smooth slide
+              curve: Curves.easeOutExpo, // Ekdam smooth premium feel
+              bottom: _aiResultText.isNotEmpty ? 0 : -screenHeight, // Agar text nahi hai to screen ke niche chhupa rahega
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                height: screenHeight * 0.45,
+                decoration: const BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  border: Border(top: BorderSide(color: Colors.cyanAccent, width: 2)),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Chhota sa drag handle design (Premium look ke liye)
+                      Center(
+                        child: Container(
+                          width: 40, height: 4,
+                          margin: const EdgeInsets.only(bottom: 15),
+                          decoration: BoxDecoration(color: Colors.white30, borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                      // AI ka Markdown Text
+                      MarkdownBody(
+                        data: _aiResultText,
+                        selectable: true, // User copy kar sakega
+                        styleSheet: MarkdownStyleSheet(
+                          p: GoogleFonts.outfit(color: Colors.white, fontSize: 16, height: 1.5),
+                          strong: GoogleFonts.outfit(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

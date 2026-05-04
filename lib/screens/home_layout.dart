@@ -1,22 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_animate/flutter_animate.dart'; // ✅ Animation Package Added
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../theme/app_colors.dart';
 import '../widgets/custom_widgets.dart';
 
-// ✅ IMPORT ALL SCREENS
-import 'repo_chat.dart';
-import 'ui_to_code.dart';
+// ✅ ONLY NETRA/SOCIAL GOOD SCREENS IMPORTED
 import 'vision_mode.dart';
 import 'voice_assistant.dart';
-import 'error_fixer.dart';
 import 'pdf_mind.dart';
-
-// 🚀 NEW FEATURES IMPORTS
-import 'architect_mode.dart';
-import 'interview_mode.dart';
 import 'visual_qa.dart';
 import 'face_emotion.dart';
 
@@ -38,35 +31,23 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
-  bool _isDevMode = true;
 
   void _changeScreen(int index) => setState(() => _selectedIndex = index);
-  void _toggleMode(bool isDev) => setState(() {
-        _isDevMode = isDev;
-        _selectedIndex = 0;
-      });
 
   @override
   Widget build(BuildContext context) {
-    // ✅ MASTER LIST OF SCREENS
+    // ✅ MASTER LIST OF SCREENS (Only Accessibility Features)
     final List<Widget> screens = [
-      HomeScreen(onNavigate: _changeScreen, isDevMode: _isDevMode), // 0
-
-      // --- DEV TOOLS ---
-      const RepoChatScreen(), // 1
-      const UIToCodeScreen(), // 2
-      const ErrorFixerScreen(), // 3
-      const ArchitectScreen(), // 4
-      const InterviewScreen(), // 5
+      HomeScreen(onNavigate: _changeScreen), // 0
 
       // --- NETRA TOOLS ---
-      const LiveCameraScreen(), // 6
-      const VoiceScreen(), // 7
-      const PDFScreen(), // 8
-      const VisualQAScreen(), // 9
-      const FaceEmotionScreen(), // 10
-
-      const UpgradeScreen(), // 11
+      const LiveCameraScreen(), // 1
+      const VoiceScreen(), // 2
+      const PDFScreen(), // 3
+      const VisualQAScreen(), // 4
+      const FaceEmotionScreen(), // 5
+      
+      const UpgradeScreen(), // 6
     ];
 
     // Safety check
@@ -79,7 +60,7 @@ class _MainLayoutState extends State<MainLayout> {
         flexibleSpace: ClipRRect(
             child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(color: Colors.black.withOpacity(0.5)))),
+                child: Container(color: Colors.black.withAlpha(128)))),
         title: _buildAppBarTitle(),
         centerTitle: true,
         leading: Builder(
@@ -93,8 +74,6 @@ class _MainLayoutState extends State<MainLayout> {
           backgroundColor: AppColors.backgroundDark,
           child: SidebarContent(
               selectedIndex: _selectedIndex,
-              isDevMode: _isDevMode,
-              onModeChange: _toggleMode,
               onTap: (index) {
                 _changeScreen(index);
                 Navigator.pop(context);
@@ -117,10 +96,9 @@ class _MainLayoutState extends State<MainLayout> {
           borderRadius: BorderRadius.circular(30),
           border: Border.all(color: AppColors.borderSubtle)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(_isDevMode ? Icons.terminal_rounded : Icons.visibility_rounded,
-            color: AppColors.primaryAccent, size: 18),
+        const Icon(Icons.visibility_rounded, color: AppColors.primaryAccent, size: 18),
         const SizedBox(width: 10),
-        Text(_isDevMode ? "Developer Mode" : "Netra Vision Mode",
+        Text("Netra Assist Mode",
             style: GoogleFonts.outfit(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -139,14 +117,11 @@ class _MainLayoutState extends State<MainLayout> {
 class SidebarContent extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
-  final bool isDevMode;
-  final Function(bool) onModeChange;
+  
   const SidebarContent(
       {super.key,
       required this.selectedIndex,
-      required this.onTap,
-      required this.isDevMode,
-      required this.onModeChange});
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -154,29 +129,17 @@ class SidebarContent extends StatelessWidget {
         color: AppColors.backgroundDark,
         child: Column(children: [
           const SizedBox(height: 60),
+          // ✅ RENAMED TO NETRA ASSIST
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.code_rounded,
+            const Icon(Icons.remove_red_eye,
                 color: AppColors.primaryAccent, size: 32),
             const SizedBox(width: 10),
-            Text("CodeNetra",
+            Text("Netra Assist",
                 style: GoogleFonts.outfit(
                     fontSize: 26, fontWeight: FontWeight.w800))
           ]).animate().fadeIn().scale(), // Logo Pop
 
-          const SizedBox(height: 30),
-
-          Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                  color: AppColors.cardSurface,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColors.borderSubtle)),
-              child: Row(children: [
-                _modeButton("Code", Icons.code_rounded, true),
-                _modeButton("Netra", Icons.visibility_rounded, false)
-              ])),
-          const SizedBox(height: 30),
+          const SizedBox(height: 40), // Removed the toggle switch area
 
           Expanded(
               child: SingleChildScrollView(
@@ -184,65 +147,23 @@ class SidebarContent extends StatelessWidget {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _header(isDevMode
-                            ? "DEVELOPMENT SUITE"
-                            : "ACCESSIBILITY SUITE"),
+                        _header("ACCESSIBILITY SUITE"),
                         _btn("Dashboard", Icons.dashboard_rounded, 0),
 
-                        // 🔥 DEV BUTTONS
-                        if (isDevMode) ...[
-                          _btn("Repo Chat", Icons.folder_zip_rounded, 1),
-                          _btn("UI to Code", Icons.image_aspect_ratio_rounded,
-                              2),
-                          _btn("Error Debugger", Icons.bug_report_rounded, 3),
-                          _btn("System Architect", Icons.architecture, 4),
-                          _btn("Mock Interview", Icons.record_voice_over, 5),
-                        ]
-                        // 🔥 NETRA BUTTONS
-                        else ...[
-                          _btn("Live Vision", Icons.camera_enhance_rounded, 6),
-                          _btn("Voice Assistant", Icons.graphic_eq_rounded, 7),
-                          _btn("PDF Intelligence", Icons.picture_as_pdf_rounded,
-                              8),
-                          _btn("Visual Q&A", Icons.help_outline, 9),
-                          _btn("Face & Emotion", Icons.face_retouching_natural,
-                              10),
-                        ],
+                        // 🔥 ONLY NETRA BUTTONS (Indexes updated)
+                        _btn("Live Vision", Icons.camera_enhance_rounded, 1),
+                        _btn("Voice Assistant", Icons.graphic_eq_rounded, 2),
+                        _btn("PDF Intelligence", Icons.picture_as_pdf_rounded, 3),
+                        _btn("Visual Q&A", Icons.help_outline, 4),
+                        _btn("Face & Emotion", Icons.face_retouching_natural, 5),
                       ]
-                          // Staggered List Animation (Menu items slide in one by one)
+                          // Staggered List Animation
                           .animate(interval: 50.ms)
                           .fadeIn(duration: 400.ms)
                           .slideX(begin: -0.1, end: 0)))),
-          _btn("Upgrade Plan", Icons.bolt_rounded, 11),
+          _btn("Upgrade Plan", Icons.bolt_rounded, 6),
           const SizedBox(height: 20),
         ]));
-  }
-
-  Widget _modeButton(String text, IconData icon, bool isForDev) {
-    bool isActive = isDevMode == isForDev;
-    return Expanded(
-        child: GestureDetector(
-            onTap: () => onModeChange(isForDev),
-            child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                    color:
-                        isActive ? AppColors.primaryAccent : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12)),
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(icon,
-                      size: 18,
-                      color: isActive ? Colors.black : AppColors.textSecondary),
-                  const SizedBox(width: 8),
-                  Text(text,
-                      style: TextStyle(
-                          color:
-                              isActive ? Colors.black : AppColors.textSecondary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16))
-                ]))));
   }
 
   Widget _header(String text) => Padding(
@@ -253,6 +174,7 @@ class SidebarContent extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w800,
               letterSpacing: 1)));
+              
   Widget _btn(String title, IconData icon, int index) {
     bool isSelected = selectedIndex == index;
     return Container(
@@ -262,7 +184,7 @@ class SidebarContent extends StatelessWidget {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             tileColor: isSelected
-                ? AppColors.primaryAccent.withOpacity(0.15)
+                ? AppColors.primaryAccent.withAlpha(38)
                 : Colors.transparent,
             leading: Icon(icon,
                 color: isSelected
@@ -285,23 +207,38 @@ class SidebarContent extends StatelessWidget {
 // -----------------------------------------------------------------------------
 class HomeScreen extends StatelessWidget {
   final Function(int) onNavigate;
-  final bool isDevMode;
-  const HomeScreen(
-      {super.key, required this.onNavigate, required this.isDevMode});
+  const HomeScreen({super.key, required this.onNavigate});
+  
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         padding:
             const EdgeInsets.only(top: 100, left: 24, right: 24, bottom: 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // 1️⃣ Header Animation (Slide Down)
+          // 1️⃣ Header Animation
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text("Hello, ${isDevMode ? 'Developer' : 'Netra User'}",
+              Text("Hello, Netra User",
                   style: GoogleFonts.outfit(
                       fontSize: 30, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              StatusBadge(isDevMode: isDevMode)
+              // ✅ HARDCODED STATUS BADGE TO AVOID ERRORS
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.withAlpha(30),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.green.withAlpha(100))
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.circle, color: Colors.green, size: 10),
+                    const SizedBox(width: 6),
+                    Text("Vision Intelligence Active", 
+                      style: GoogleFonts.inter(fontSize: 12, color: Colors.green, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              )
             ]),
             const CircleAvatar(
                 backgroundColor: AppColors.cardSurface,
@@ -313,59 +250,39 @@ class HomeScreen extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          // 2️⃣ BIG CARD (Slide Up + Shimmer)
+          // 2️⃣ BIG CARD - LIVE VISION (Index updated to 1)
           _largeActionCard(
-                  title: isDevMode ? "System Architect" : "Live Vision",
-                  subtitle: isDevMode
-                      ? "Design Databases & APIs Instantly"
-                      : "Identify Objects & Read Text",
-                  icon: isDevMode ? Icons.architecture : Icons.remove_red_eye,
+                  title: "Live Vision",
+                  subtitle: "Identify Objects & Read Text",
+                  icon: Icons.remove_red_eye,
                   color: AppColors.primaryAccent,
-                  onTap: () => onNavigate(isDevMode ? 4 : 6))
+                  onTap: () => onNavigate(1))
               .animate()
-              .fadeIn(duration: 600.ms, delay: 200.ms) // Wait for header
+              .fadeIn(duration: 600.ms, delay: 200.ms) 
               .slideY(
-                  begin: 0.2, end: 0, curve: Curves.easeOutBack) // Bouncy up
+                  begin: 0.2, end: 0, curve: Curves.easeOutBack) 
               .shimmer(
                   delay: 1200.ms,
                   duration: 1500.ms,
-                  color: Colors.white.withOpacity(0.4)), // ✨ SHINE EFFECT
+                  color: Colors.white.withAlpha(102)), 
 
           const SizedBox(height: 20),
 
-          // 3️⃣ SMALL CARDS GRID (Staggered Animation)
+          // 3️⃣ SMALL CARDS GRID - VISUAL Q&A AND EMOTION SCAN
           Row(children: [
-            if (isDevMode) ...[
-              Expanded(
-                  child: _smallCard("Repo Chat", Icons.folder_zip, Colors.blue,
-                          () => onNavigate(1))
-                      .animate()
-                      .fadeIn(delay: 400.ms)
-                      .slideX(begin: -0.2, end: 0) // Comes from left
-                  ),
-              const SizedBox(width: 15),
-              Expanded(
-                  child: _smallCard("Mock Interview", Icons.record_voice_over,
-                          Colors.orange, () => onNavigate(5))
-                      .animate()
-                      .fadeIn(delay: 500.ms)
-                      .slideX(begin: 0.2, end: 0) // Comes from right
-                  )
-            ] else ...[
-              Expanded(
-                  child: _smallCard("Visual Q&A", Icons.help_outline,
-                          Colors.pink, () => onNavigate(9))
-                      .animate()
-                      .fadeIn(delay: 400.ms)
-                      .slideX(begin: -0.2, end: 0)),
-              const SizedBox(width: 15),
-              Expanded(
-                  child: _smallCard("Emotion Scan", Icons.face, Colors.purple,
-                          () => onNavigate(10))
-                      .animate()
-                      .fadeIn(delay: 500.ms)
-                      .slideX(begin: 0.2, end: 0))
-            ]
+             Expanded(
+                 child: _smallCard("Visual Q&A", Icons.help_outline,
+                         Colors.pink, () => onNavigate(4)) // Index 4
+                     .animate()
+                     .fadeIn(delay: 400.ms)
+                     .slideX(begin: -0.2, end: 0)),
+             const SizedBox(width: 15),
+             Expanded(
+                 child: _smallCard("Emotion Scan", Icons.face, Colors.purple,
+                         () => onNavigate(5)) // Index 5
+                     .animate()
+                     .fadeIn(delay: 500.ms)
+                     .slideX(begin: 0.2, end: 0))
           ])
         ]));
   }
@@ -383,11 +300,11 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
                 gradient:
-                    LinearGradient(colors: [color.withOpacity(0.8), color]),
+                    LinearGradient(colors: [color.withAlpha(204), color]),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                      color: color.withOpacity(0.4),
+                      color: color.withAlpha(102),
                       blurRadius: 20,
                       offset: const Offset(0, 8))
                 ]),
@@ -430,7 +347,7 @@ class HomeScreen extends StatelessWidget {
               Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      color: color.withOpacity(0.1), shape: BoxShape.circle),
+                      color: color.withAlpha(26), shape: BoxShape.circle),
                   child: Icon(icon, color: color)),
               const SizedBox(height: 15),
               Text(title,
