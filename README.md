@@ -127,16 +127,30 @@ Helps blind users understand social interactions by scanning faces and detecting
 
 ---
 
+# 🔭 Future Roadmap: The "AI Digital Eyes" Ecosystem
+
+> **Vision for SDG 3:** Netra Assist is the foundation for a complete AI accessibility platform aimed at long-term independence for the visually impaired. 
+
+To ensure ultimate safety and independence, our future updates will focus on:
+
+* 🔌 **Offline AI Integration:** Moving beyond API reliance by embedding on-device models (**YOLO, TensorFlow Lite, MediaPipe**) for zero-latency, internet-free hazard detection.
+* 👓 **AI Smart Glasses Support:** Integrating the Netra Brain with wearable smart glasses for a completely hands-free, heads-up experience.
+* 🗺️ **Smart Navigation System:** AI-powered GPS walking assistant providing highly accurate, voice-based turn-by-turn directions.
+* 🚨 **Emergency Safety System:** Automatic danger detection that instantly sends SOS alerts and location warnings to guardians and family members.
+* ⚡ **Performance Optimization:** Building low-latency AI pipelines and optimized camera processing for a smooth, battery-efficient experience.
+
+---
+
 # 🛠️ Tech Stack
 
 | Layer | Technology |
 |------|------------|
 | Frontend | Flutter (Dart) |
-| AI Model | Google Gemini Flash |
+| AI Model | Google Gemini 3 Flash Preview (Ultra-low latency) |
 | Vision | Camera + Image Picker |
 | Voice | Speech-to-Text + Flutter TTS |
 | Document Processing | Syncfusion PDF + Markdown |
-| Backend (Optional) | Firebase |
+| Backend | Firebase |
 
 ---
 ### 🏆 Hackathon Note
@@ -144,39 +158,68 @@ Helps blind users understand social interactions by scanning faces and detecting
 Netra Assist is a working, inclusive AI product demonstrating real-world impact for **SDG 3 (Health and Well-being)**. 
 
 * **Accessibility Innovation:** Real-time help for the visually impaired.
-* **Social Good:** Using cutting-edge tech to solve human-centric problems.
+* **Robust Architecture:** Features an advanced Auto-Failover & API Load Balancing system for uninterrupted real-time vision.
 * **✅ Solo Developer Verification:** Please note that all commits from user **`roshancodes036-sudo`** belong to the **Sole Creator, Roshan Chaurasiya**.
 
 ---
 
 # 🔐 API Key & Security Setup (Important)
 
-For security reasons, the API key logic is **not included** in this public repository.
+For security reasons, the API keys and `.env` file are **not included** in this public repository. The app uses an advanced Auto-Failover & Load Balancing system with 5 API keys for uninterrupted real-time performance.
 
 ### 🛠️ How to Fix & Run the App:
 
-1. **Get API Key:** Get your free key from [Google AI Studio](https://aistudio.google.com/).
-2. **Create File:** Go to `lib/services/` folder and create a new file named **`ai_logic.dart`**.
-3. **Paste Code:** Copy and paste the following code into that file (Replace `YOUR_KEY` with your actual key):
-```dart
+1. **Get API Keys:** Get free keys from [Google AI Studio](https://aistudio.google.com/).
+2. **Create `.env` File:** Create a file named `.env` in the root folder of the project and add your keys like this:
+   ```env
+   GEMINI_KEY_1=your_api_key_1_here
+   GEMINI_KEY_2=your_api_key_2_here
+   GEMINI_KEY_3=your_api_key_3_here
+   GEMINI_KEY_4=your_api_key_4_here
+   GEMINI_KEY_5=your_api_key_5_here
+
+3.Create AI Logic File: Go to the lib/services/ folder and create a new file named ai_logic.dart.
+
+4.Paste Code: Copy and paste the following code into that file:
 import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'dart:developer' as developer;
+// ✅ FIX: dotenv पैकेज इम्पोर्ट किया गया है
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AIBrain {
-  // ✅ User API Key Integration
-  static const String _apiKey = "YOUR API KEY HERE";
+  // ⚠️ सावधानी: प्रोडक्शन में API Key को '.env' फाइल में रखना चाहिए।
+  // ✅ 5 API Keys for Auto-Failover & Load Balancing (Hackathon Model)
+  static final List<String> _apiKeys = [
+    dotenv.env['GEMINI_KEY_1'] ?? '', 
+    dotenv.env['GEMINI_KEY_2'] ?? '', 
+    dotenv.env['GEMINI_KEY_3'] ?? '', 
+    dotenv.env['GEMINI_KEY_4'] ?? '', 
+    dotenv.env['GEMINI_KEY_5'] ?? '', 
+  ];
+
+  int _currentKeyIndex = 0;
 
   late GenerativeModel _model;
   late ChatSession _chat;
   bool _isInitialized = false;
 
+  // 🌐 NEW: Bhasha Setu (Language Toggle) - Default English
+  static bool isHindi = false;
+
   void initBrain() {
     try {
+      String activeKey = _apiKeys[_currentKeyIndex];
+      
+      // ✅ Safety Check
+      if (activeKey.isEmpty) {
+        developer.log("❌ Error: API Key is missing in .env file!");
+        return;
+      }
+
       _model = GenerativeModel(
-        // 🔥 Fast model for real-time Live Vision
-        model: 'gemini-1.5-flash',
-        apiKey: _apiKey,
+        model: 'gemini-3-flash-preview',
+        apiKey: activeKey,
       );
       _chat = _model.startChat();
       _isInitialized = true;
@@ -186,65 +229,132 @@ class AIBrain {
     }
   }
 
-  // 🔹 System Instruction (Language + Tone + Safety)
-  String get _systemInstruction =>
-      " (Reply in the same language as the user (English, Hindi, or Hinglish). Keep the tone professional yet friendly. Use relevant emojis naturally. For blind users, provide concise, safety-first descriptions regarding obstacles, currency, or text.)";
+  // 🔹 Dynamic System Instruction
+  String get _systemInstruction {
+    if (isHindi) {
+      return " (कृपया हिंदी में बहुत ही सरल और स्पष्ट जवाब दें। दृष्टिबाधित व्यक्ति के लिए सुरक्षा और आस-पास की चीजों का सटीक वर्णन करें।)";
+    } else {
+      return " (Please reply in simple English. For blind users, provide concise, safety-first descriptions regarding obstacles, currency, or text.)";
+    }
+  }
 
   // 🔥 1. TEXT ONLY CHAT
-  Future<String?> askNetra(String prompt) async {
-    try {
-      if (!_isInitialized) initBrain();
+  Future<String?> askLaravel(String prompt) async {
+    _currentKeyIndex = (_currentKeyIndex + 1) % _apiKeys.length;
+    _isInitialized = false;
 
-      // Message + Hidden Instruction
-      final content = Content.text(prompt.isNotEmpty
-          ? prompt + _systemInstruction
-          : "Hello$_systemInstruction");
+    int maxRetries = _apiKeys.length;
+    int attempts = 0;
 
-      final response = await _chat.sendMessage(content);
-      return response.text;
-    } catch (e) {
-      return "Error: ${e.toString()}";
+    while (attempts < maxRetries) {
+      try {
+        if (!_isInitialized) initBrain();
+        final content = Content.text(prompt.isNotEmpty ? prompt + _systemInstruction : "Hello$_systemInstruction");
+        final response = await _chat.sendMessage(content);
+        return response.text;
+      } catch (e) {
+        attempts++;
+        _currentKeyIndex = (_currentKeyIndex + 1) % _apiKeys.length;
+        _isInitialized = false; 
+        if (attempts >= maxRetries) return "Error: ${e.toString()}";
+      }
     }
+    return null;
   }
 
-  // 🔥 2. IMAGE + TEXT CHAT (Camera/Gallery)
+  // 🔥 2. REGULAR IMAGE CHAT
   Future<String?> askWithImage(String prompt, File imageFile) async {
-    try {
-      if (!_isInitialized) initBrain();
+    _currentKeyIndex = (_currentKeyIndex + 1) % _apiKeys.length;
+    _isInitialized = false;
 
-      // Convert image to bytes
-      final imageBytes = await imageFile.readAsBytes();
+    int maxRetries = _apiKeys.length;
+    int attempts = 0;
 
-      // Prepare Content (Text + Image)
-      final content = Content.multi([
-        TextPart(prompt.isEmpty
-            ? "Explain this image in detail for a visually impaired person.$_systemInstruction"
-            : prompt + _systemInstruction),
-        DataPart('image/jpeg', imageBytes),
-      ]);
-
-      // Send to AI
-      final response = await _model.generateContent([content]);
-      return response.text;
-    } catch (e) {
-      return "Image Error: ${e.toString()}";
+    while (attempts < maxRetries) {
+      try {
+        if (!_isInitialized) initBrain();
+        final imageBytes = await imageFile.readAsBytes();
+        final content = Content.multi([
+          TextPart(prompt.isEmpty ? (isHindi ? "एक दृष्टिबाधित व्यक्ति के लिए इस तस्वीर को विस्तार से समझाएं।$_systemInstruction" : "Explain this image in detail for a visually impaired person.$_systemInstruction") : prompt + _systemInstruction),
+          DataPart('image/jpeg', imageBytes),
+        ]);
+        final response = await _model.generateContent([content]);
+        return response.text;
+      } catch (e) {
+        attempts++;
+        _currentKeyIndex = (_currentKeyIndex + 1) % _apiKeys.length;
+        _isInitialized = false;
+        if (attempts >= maxRetries) return "Image Error: ${e.toString()}";
+      }
     }
+    return null;
   }
 
-  void stopSpeaking() {
-    // Future scope for stopping TTS
+  // 🚀 3. SUPER-FAST LIVE VISION
+  Future<String?> fastVisionScan(File imageFile) async {
+    _currentKeyIndex = (_currentKeyIndex + 1) % _apiKeys.length;
+    _isInitialized = false;
+
+    int maxRetries = _apiKeys.length;
+    int attempts = 0;
+
+    while (attempts < maxRetries) {
+      try {
+        if (!_isInitialized) initBrain();
+        String fastPrompt = isHindi ? "सामने मौजूद मुख्य खतरे या वस्तु को अधिकतम 3-4 शब्दों में बताएं।" : "Describe the primary hazard or object ahead in max 3-4 words.";
+        final imageBytes = await imageFile.readAsBytes();
+        final content = Content.multi([TextPart(fastPrompt), DataPart('image/jpeg', imageBytes)]);
+        final response = await _model.generateContent([content]);
+        return response.text;
+      } catch (e) {
+        attempts++;
+        _currentKeyIndex = (_currentKeyIndex + 1) % _apiKeys.length;
+        _isInitialized = false;
+        if (attempts >= maxRetries) return isHindi ? "स्कैनिंग में एरर" : "Scan Error";
+      }
+    }
+    return null;
+  }
+
+  // 🛡️ 4. SUPER-FAST DOCUMENT SCANNER
+  Future<String?> analyzeDocumentLive(File imageFile) async {
+    _currentKeyIndex = (_currentKeyIndex + 1) % _apiKeys.length;
+    _isInitialized = false;
+
+    int maxRetries = _apiKeys.length;
+    int attempts = 0;
+
+    while (attempts < maxRetries) {
+      try {
+        if (!_isInitialized) initBrain();
+        String langInstruction = isHindi ? "HINDI language" : "ENGLISH language";
+        String secretPrompt = isHindi 
+            ? "कैमरे की इस फोटो को देखो। \nनियम 1: अगर इस फोटो में कोई स्पष्ट कागज़, बिल, या डॉक्यूमेंट नहीं है, तो सिर्फ 'NO_DOC' लिखो।\nनियम 2: अगर कागज़ है, तो बहुत ही संक्षेप में $langInstruction में बताओ:\n**1. 📄 क्या है?:**\n**2. 📝 मुख्य बात:**\n**3. ⚠️ अलर्ट:**"
+            : "Look at this photo.\nRULE 1: If there is NO clear paper, bill, or document in the image, reply EXACTLY with 'NO_DOC'.\nRULE 2: If there is a document, reply briefly in $langInstruction:\n**1. 📄 What is it?:**\n**2. 📝 Summary:**\n**3. ⚠️ Alert:**";
+
+        final imageBytes = await imageFile.readAsBytes();
+        final content = Content.multi([TextPart(secretPrompt), DataPart('image/jpeg', imageBytes)]);
+        final response = await _model.generateContent([content]);
+        return response.text;
+      } catch (e) {
+        attempts++;
+        _currentKeyIndex = (_currentKeyIndex + 1) % _apiKeys.length;
+        _isInitialized = false;
+        if (attempts >= maxRetries) return "NO_DOC"; 
+      }
+    }
+    return null;
   }
 }
 
+
 ⚡ Run Locally
-1. Clone Repository
+1.Clone Repository:
 git clone [https://github.com/roshancodes036-sudo/Netra-Assist-AI.git](https://github.com/roshancodes036-sudo/Netra-Assist-AI.git)
 cd Netra-Assist-AI
 
-2. Install & Run
+2.Install & Run:
 flutter pub get
 flutter run
 
-👨‍💻 Author Roshan Chaurasiya 📍 Ghazipur, India
-
-Built with ❤️ to demonstrate the real-world impact of AI for Social Good.
+👨‍💻 Built by Roshan Chaurasiya 📍 Ghazipur, India Built with ❤️ to demonstrate the real-world impact of AI for Social Good.
